@@ -4,9 +4,12 @@
     "item.nightrunner_difficulty.gold_wand": "Gold Wand",
     "item.nightrunner_difficulty.iron_wand": "Iron Wand",
     "item.nightrunner_difficulty.diamond_wand": "Diamond Wand",
+
     "item.nightrunner_difficulty.wooden_staff": "Wooden Staff",
     "item.nightrunner_difficulty.stone_staff": "Stone Staff",
     "item.nightrunner_difficulty.gold_staff": "Gold Staff",
     "item.nightrunner_difficulty.iron_staff": "Iron Staff",
-    "item.nightrunner_difficulty.diamond_staff": "Diamond Staff"
+    "item.nightrunner_difficulty.diamond_staff": "Diamond Staff",
+
+    "creativetab.nightrunner_difficulty.nightrunner_items": "Nightrunner Items"
 }

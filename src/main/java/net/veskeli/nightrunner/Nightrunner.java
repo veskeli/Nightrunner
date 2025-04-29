@@ -1,5 +1,6 @@
 package net.veskeli.nightrunner;
 
+import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
 import org.slf4j.Logger;
 
@@ -56,6 +57,9 @@ public class Nightrunner
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
 
+        // Register the creative mode tab
+        ModCreativeModeTabs.register(modEventBus);
+
         // Register the mod items
         ModItems.register(modEventBus);
 
@@ -74,21 +78,7 @@ public class Nightrunner
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
-        if(event.getTabKey() == CreativeModeTabs.COMBAT)
-        {
-            // Wands
-            event.accept(ModItems.WoodenWand);
-            event.accept(ModItems.StoneWand);
-            event.accept(ModItems.GoldWand);
-            event.accept(ModItems.IronWand);
-            event.accept(ModItems.DiamondWand);
-            // Staffs
-            event.accept(ModItems.WoodenStaff);
-            event.accept(ModItems.StoneStaff);
-            event.accept(ModItems.GoldStaff);
-            event.accept(ModItems.IronStaff);
-            event.accept(ModItems.DiamondStaff);
-        }
+
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
