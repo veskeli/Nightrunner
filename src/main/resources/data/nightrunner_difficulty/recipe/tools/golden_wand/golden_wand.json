@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "i": {
+      "item": "minecraft:stick"
+    },
+    "y": {
+      "item": "minecraft:golden_ingot"
+    }
+  },
+  "pattern": [
+    " y",
+    "i "
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:gold_wand"
+  }
+}

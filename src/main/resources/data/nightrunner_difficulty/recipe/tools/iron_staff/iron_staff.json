@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "i": {
+      "item": "minecraft:stick"
+    },
+    "y": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    "  y",
+    " i ",
+    "i  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:iron_staff"
+  }
+}

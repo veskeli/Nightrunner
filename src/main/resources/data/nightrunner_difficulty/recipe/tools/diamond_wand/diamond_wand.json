@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "i": {
+      "item": "minecraft:stick"
+    },
+    "y": {
+      "item": "minecraft:diamond"
+    }
+  },
+  "pattern": [
+    " y",
+    "i "
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:diamond_wand"
+  }
+}
