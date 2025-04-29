@@ -1,0 +1,20 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+      "layer0": "nightrunner_difficulty:item/gold_staff"
+    },
+    "display": {
+      "thirdperson_righthand": {
+        "rotation": [0, -90, 40]
+      },
+      "thirdperson_lefthand": {
+        "rotation": [0, 90, -40]
+      },
+      "firstperson_righthand": {
+        "rotation": [0, 90, 40]
+      },
+      "firstperson_lefthand": {
+        "rotation": [0, -90, -40]
+      }
+    }
+}

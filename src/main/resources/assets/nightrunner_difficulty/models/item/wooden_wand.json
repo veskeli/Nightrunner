@@ -1,0 +1,22 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+      "layer0": "nightrunner_difficulty:item/wooden_wand"
+    },
+    "display": {
+      "thirdperson_righthand": {
+        "rotation": [0, -90, 40],
+        "translation": [0, 2.5, 0]
+      },
+      "thirdperson_lefthand": {
+        "rotation": [0, 90, -40],
+        "translation": [0, 2.5, 0]
+      },
+      "firstperson_righthand": {
+        "rotation": [0, 90, 40]
+      },
+      "firstperson_lefthand": {
+        "rotation": [0, -90, -40]
+      }
+    }
+}
