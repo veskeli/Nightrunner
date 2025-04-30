@@ -7,6 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
+import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 
 import java.util.function.Supplier;
 
@@ -18,6 +19,13 @@ public class ModEntities {
             ENTITIES.register("grave", () -> EntityType.Builder.of(GraveEntity::new, MobCategory.MISC)
                     .sized(0.6f, 1.5f)
                     .build(Nightrunner.MODID + ":grave"));
+
+    public static final Supplier<EntityType<WandProjectile>> WAND_PROJECTILE = ENTITIES.register("wand_projectile",
+            () -> EntityType.Builder.<WandProjectile>of(WandProjectile::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f) // size like a snowball
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("wand_projectile"));
 
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
