@@ -27,6 +27,9 @@ public class ModItems {
     public static final DeferredItem<Item> IronStaff = ITEMS.register("iron_staff", () -> new Item(new Item.Properties().durability(250)));
     public static final DeferredItem<Item> DiamondStaff = ITEMS.register("diamond_staff", () -> new Item(new Item.Properties().durability(1561)));
 
+    // Revive items
+    public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone", () -> new Item(new Item.Properties().stacksTo(1)));
+
     public static void register(IEventBus eventBus){
         // Register the DeferredRegister to the event bus so blocks get registered
         ITEMS.register(eventBus);

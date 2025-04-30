@@ -23,12 +23,16 @@ public class ModCreativeModeTabs {
                 output.accept(ModItems.GoldWand.get());
                 output.accept(ModItems.IronWand.get());
                 output.accept(ModItems.DiamondWand.get());
+
                 // Staffs
                 output.accept(ModItems.WoodenStaff.get());
                 output.accept(ModItems.StoneStaff.get());
                 output.accept(ModItems.GoldStaff.get());
                 output.accept(ModItems.IronStaff.get());
                 output.accept(ModItems.DiamondStaff.get());
+
+                // Revive items
+                output.accept(ModItems.Soulstone.get());
             }).build());
 
 

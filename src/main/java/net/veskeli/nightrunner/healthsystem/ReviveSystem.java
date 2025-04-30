@@ -14,6 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
+import net.veskeli.nightrunner.item.ModItems;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class ReviveSystem {
 
     // Enum to handle different item types for revival
     public enum RevivalItem {
-        GOLDEN_APPLE {
+        SOULSTONE {
             @Override
             public void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand) {
                 System.out.println("Reviving with Golden Apple");
@@ -76,19 +77,6 @@ public class ReviveSystem {
                 handleReviveConvert(ownerPlayer, grave);
 
                 // Consume the golden apple
-                itemInHand.shrink(1);
-            }
-        },
-        ENCHANTED_GOLDEN_APPLE {
-            @Override
-            public void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand) {
-                System.out.println("Reviving with Enchanted Golden Apple");
-                // Restore inventory and set player stats
-                restoreInventory(ownerPlayer, grave);
-                restoreStats(ownerPlayer, 20.0f); // Restore health with 10 hearts (20 health)
-                handleReviveConvert(ownerPlayer, grave);
-
-                // Consume the enchanted golden apple
                 itemInHand.shrink(1);
             }
         };
@@ -124,11 +112,8 @@ public class ReviveSystem {
 
         // Helper method to find the correct RevivalItem by checking the item in hand
         public static RevivalItem fromItem(ItemStack itemStack) {
-            if (itemStack.is(Items.GOLDEN_APPLE)) {
-                return GOLDEN_APPLE;
-            }
-            if (itemStack.is(Items.ENCHANTED_GOLDEN_APPLE)) {
-                return ENCHANTED_GOLDEN_APPLE;
+            if (itemStack.is(ModItems.Soulstone)) {
+                return SOULSTONE;
             }
             return null;  // No revival item found
         }
