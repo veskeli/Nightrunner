@@ -1,5 +1,8 @@
 package net.veskeli.nightrunner;
 
+import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.veskeli.nightrunner.entity.ModEntities;
+import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
 import org.slf4j.Logger;
@@ -57,6 +60,11 @@ public class Nightrunner
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
 
+        NeoForge.EVENT_BUS.register(new ModEvents());
+
+        // Register the mod entities
+        ModEntities.register(modEventBus);
+
         // Register the creative mode tab
         ModCreativeModeTabs.register(modEventBus);
 
@@ -97,6 +105,7 @@ public class Nightrunner
         public static void onClientSetup(FMLClientSetupEvent event)
         {
 
+            EntityRenderers.register(ModEntities.GRAVE.get(), GraveRenderer::new);
         }
     }
 }

@@ -11,5 +11,7 @@
     "item.nightrunner_difficulty.iron_staff": "Iron Staff",
     "item.nightrunner_difficulty.diamond_staff": "Diamond Staff",
 
-    "creativetab.nightrunner_difficulty.nightrunner_items": "Nightrunner Items"
+    "creativetab.nightrunner_difficulty.nightrunner_items": "Nightrunner Items",
+
+    "entity.nightrunner_difficulty.grave": "Grave"
 }
