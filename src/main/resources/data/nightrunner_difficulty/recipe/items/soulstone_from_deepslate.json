@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "i": {
+      "item": "minecraft:cobbled_deepslate"
+    },
+    "y": {
+      "item": "minecraft:rotten_flesh"
+    }
+  },
+  "pattern": [
+    " y ",
+    "yyy",
+    "iii"
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:soulstone"
+  }
+}

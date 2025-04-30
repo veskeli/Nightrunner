@@ -70,7 +70,6 @@ public class ReviveSystem {
         SOULSTONE {
             @Override
             public void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand) {
-                System.out.println("Reviving with Golden Apple");
                 // Restore inventory and set player stats
                 restoreInventory(ownerPlayer, grave);
                 restoreStats(ownerPlayer, 16.0f); // Restore health with 8 hearts (16 health)
