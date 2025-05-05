@@ -1,6 +1,9 @@
 package net.veskeli.nightrunner;
 
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.entity.GhastRenderer;
+import net.minecraft.world.entity.monster.Ghast;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
@@ -104,8 +107,18 @@ public class Nightrunner
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-
             EntityRenderers.register(ModEntities.GRAVE.get(), GraveRenderer::new);
+
+            EntityRenderers.register(ModEntities.MULTI_GHAST.get(), GhastRenderer::new);
+        }
+    }
+
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)
+    public static class ModEventSubscriber {
+
+        @SubscribeEvent
+        public static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
+            event.put(ModEntities.MULTI_GHAST.get(), Ghast.createAttributes().build());
         }
     }
 }
