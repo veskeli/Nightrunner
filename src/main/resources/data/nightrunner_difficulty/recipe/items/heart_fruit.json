@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "i": {
+      "item": "minecraft:copper_ingot"
+    },
+    "y": {
+      "item": "minecraft:baked_potato"
+    }
+  },
+  "pattern": [
+    " i ",
+    "iyi",
+    " i "
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:heart_fruit"
+  }
+}

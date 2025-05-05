@@ -33,6 +33,10 @@ public class ModCreativeModeTabs {
 
                 // Revive items
                 output.accept(ModItems.Soulstone.get());
+
+                // Heart fruits
+                output.accept(ModItems.HeartFruit.get());
+                output.accept(ModItems.HeartFruitPlus.get());
             }).build());
 
 

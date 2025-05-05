@@ -15,5 +15,10 @@
 
     "creativetab.nightrunner_difficulty.nightrunner_items": "Nightrunner Items",
 
-    "entity.nightrunner_difficulty.grave": "Grave"
+    "entity.nightrunner_difficulty.grave": "Grave",
+
+    "item.nightrunner_difficulty.heart_fruit": "Heart Fruit",
+    "item.nightrunner_difficulty.heart_fruit_plus": "Heart Fruit plus",
+
+    "item.nightrunner_difficulty.mana_orb": "Mana Orb"
 }

@@ -44,6 +44,7 @@ import net.veskeli.nightrunner.healthsystem.GraveDataStore;
 import net.veskeli.nightrunner.healthsystem.HealthStats;
 import net.veskeli.nightrunner.healthsystem.HealthSystem;
 import net.veskeli.nightrunner.healthsystem.ReviveSystem;
+import net.veskeli.nightrunner.item.ModItems;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -107,7 +108,22 @@ public class ModEvents {
         ItemStack itemInHand = event.getItem();
 
         // Try to use health modifier item
-        HealthSystem.tryUseHealthModifierItem(event, player, itemInHand);
+        boolean healthSuccess = HealthSystem.tryUseHealthModifierItem(event, player, itemInHand);
+
+        if(healthSuccess)
+        {
+            return; // Exit if health modifier item was used successfully
+        }
+
+        // Check if the item is heart fruit or heart fruit plus
+        if(itemInHand.is(ModItems.HeartFruit))
+        {
+            HealthSystem.addTemporaryHealth(player, 1.0f, 2.0f);
+        }
+        else if(itemInHand.is(ModItems.HeartFruitPlus))
+        {
+            HealthSystem.addTemporaryHealth(player, 3.0f, 6.0f);
+        }
     }
 
     private void dropItemsToFloor(ServerPlayer player) {

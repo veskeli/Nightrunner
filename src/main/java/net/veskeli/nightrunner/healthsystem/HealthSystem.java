@@ -20,6 +20,22 @@ import java.util.Objects;
 
 public class HealthSystem {
 
+    public static void addTemporaryHealth(Player player, float tempHealthAmount, float MaxAbsorptionValue) {
+        // get the current absorption amount
+        float currentAbsorption = player.getAbsorptionAmount();
+
+        float newAbsorption = Math.clamp(currentAbsorption + tempHealthAmount, 0, MaxAbsorptionValue);
+
+        // return if current absorption is greater than the new absorption
+        if (currentAbsorption >= newAbsorption) {
+            return;
+        }
+
+        // set the new absorption amount
+        player.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(newAbsorption);
+        player.setAbsorptionAmount(newAbsorption);
+    }
+
     // Set the player's max health to a value greater than the current max health if possible
     public static boolean setPlayerMaxHealthMoreIfPossible(Player player, float healthValue) {
         // Get the player's health stats
@@ -60,23 +76,24 @@ public class HealthSystem {
         player.setHealth(healthValue);
     }
 
-    public static void tryUseHealthModifierItem(LivingEntityUseItemEvent.Finish event, Player player, ItemStack itemInHand) {
+    public static boolean tryUseHealthModifierItem(LivingEntityUseItemEvent.Finish event, Player player, ItemStack itemInHand) {
         // Check if the item is a health modifier item
         HealthModifierItem healthModifierItem = HealthModifierItem.fromItem(itemInHand);
         // If the item is not a health modifier item, return
         if (healthModifierItem == null) {
             System.out.println("Item is not a health modifier item");
-            return;
+            return false;
         }
 
         ServerPlayer serverPlayer = (ServerPlayer) player;
         if(serverPlayer == null) {
             System.out.println("ServerPlayer is null");
-            return;
+            return false;
         }
 
         // Use the item
         healthModifierItem.useHealthModifier(serverPlayer, itemInHand);
+        return true;
     }
 
     // Enum to handle different item types for revival
@@ -94,8 +111,7 @@ public class HealthSystem {
                 ownerPlayer.removeEffect(MobEffects.ABSORPTION);
 
                 // Add 10 absorption hearts
-                ownerPlayer.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(10);
-                ownerPlayer.setAbsorptionAmount(10.f);
+                addTemporaryHealth(ownerPlayer, 10.f, 10.f);
             }
         },
         GOLDEN_CARROT {

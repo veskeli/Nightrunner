@@ -1,5 +1,6 @@
 package net.veskeli.nightrunner.item;
 
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
@@ -35,6 +36,13 @@ public class ModItems {
 
     // Revive items
     public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    // Heart fruit
+    public static final DeferredItem<Item> HeartFruit = ITEMS.register("heart_fruit",
+            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build())));
+    // Heart fruit plus
+    public static final DeferredItem<Item> HeartFruitPlus = ITEMS.register("heart_fruit_plus",
+            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build())));
 
     // Mana Orb
     public static final DeferredItem<Item> ManaOrb = ITEMS.register("mana_orb", () -> new Item(new Item.Properties()));
