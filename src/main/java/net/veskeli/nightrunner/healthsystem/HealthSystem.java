@@ -2,6 +2,7 @@ package net.veskeli.nightrunner.healthsystem;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -80,14 +81,18 @@ public class HealthSystem {
         GOLDEN_APPLE {
             @Override
             public void useHealthModifier(ServerPlayer ownerPlayer, ItemStack itemInHand) {
-
-                System.out.println("Using Golden Apple for revival");
-
                 // Restore inventory and set player stats
                 HealthModifierItem.setStats(ownerPlayer, 20.f); // Restore health with 8 hearts (16 health)
 
                 // Consume 1 of the item
                 itemInHand.shrink(1);
+
+                // Remove the golden apple absorption effect
+                ownerPlayer.removeEffect(MobEffects.ABSORPTION);
+
+                // Add 10 absorption hearts
+                ownerPlayer.getAttribute(Attributes.MAX_ABSORPTION).setBaseValue(10);
+                ownerPlayer.setAbsorptionAmount(10.f);
             }
         };
 
