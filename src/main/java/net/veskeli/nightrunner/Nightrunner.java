@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.world.entity.monster.Ghast;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.veskeli.nightrunner.ManaSystem.ManaEvents;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
@@ -65,6 +66,8 @@ public class Nightrunner
 
         NeoForge.EVENT_BUS.register(new ModEvents());
 
+        //NeoForge.EVENT_BUS.register(new ManaEvents());
+
         // Register the mod entities
         ModEntities.register(modEventBus);
 
@@ -79,6 +82,9 @@ public class Nightrunner
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
+        // Register the attachments
+        ModAttachments.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

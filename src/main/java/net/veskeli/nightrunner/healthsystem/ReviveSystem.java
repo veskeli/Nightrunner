@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.item.ModItems;
 
@@ -75,7 +76,7 @@ public class ReviveSystem {
                 restoreStats(ownerPlayer, 16.0f); // Restore health with 8 hearts (16 health)
                 handleReviveConvert(ownerPlayer, grave);
 
-                // Consume the golden apple
+                // Consume 1 of the item
                 itemInHand.shrink(1);
             }
         };
@@ -96,6 +97,13 @@ public class ReviveSystem {
 
         // Helper method to set the player's health and max health
         private static void restoreStats(ServerPlayer player, float healthValue) {
+
+            // Set the player's max health stats
+            HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+            healthStats.setMaxHealth((int)healthValue);
+            player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+
+            // Set the player's health
             player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(healthValue);
             player.setHealth(healthValue);
         }

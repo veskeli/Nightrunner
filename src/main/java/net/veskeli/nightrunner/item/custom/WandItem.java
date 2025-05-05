@@ -18,6 +18,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.veskeli.nightrunner.ManaSystem.Mana;
+import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 import net.veskeli.nightrunner.item.properties.WandItemProperties;
@@ -56,8 +58,16 @@ public class WandItem extends Item{
             itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
             // Apply use time
-            player.getCooldowns().addCooldown(this, 10);
+            player.getCooldowns().addCooldown(this, 20);
         }
+
+        // reduce mana
+        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+        mana.subtractMana(1);
+        player.setData(ModAttachments.PLAYER_MANA, mana);
+
+        // print mana to action bar
+        player.displayClientMessage(Component.literal("Mana: " + mana.getMana()), true);
 
         return InteractionResultHolder.success(itemStack);
     }

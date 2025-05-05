@@ -16,10 +16,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Display;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.Villager;
@@ -31,13 +30,19 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.healthsystem.GraveDataStore;
+import net.veskeli.nightrunner.healthsystem.HealthStats;
+import net.veskeli.nightrunner.healthsystem.HealthSystem;
 import net.veskeli.nightrunner.healthsystem.ReviveSystem;
 
 import java.lang.reflect.Field;
@@ -48,13 +53,19 @@ public class ModEvents {
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
         Player newPlayer = event.getEntity();
-        newPlayer.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(16.0f);
+
+        // Load health stats
+        HealthSystem.loadPlayerMaxHealth(newPlayer);
     }
 
     @SubscribeEvent
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         Player player = event.getEntity();
-        player.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).setBaseValue(16.0f);
+
+        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+
+        // Load health stats
+        HealthSystem.loadPlayerMaxHealth(player);
     }
 
     @SubscribeEvent
@@ -81,6 +92,22 @@ public class ModEvents {
         // Store inventory
         //GraveDataStore.storeInventory(player.getUUID(), new ArrayList<>(player.getInventory().items));
         player.getInventory().clearContent();
+    }
+
+    @SubscribeEvent(priority = EventPriority.NORMAL)
+    public void onItemUseFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntity().level().isClientSide()) {
+            return; // Exit if on the client side
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        ItemStack itemInHand = event.getItem();
+
+        // Try to use health modifier item
+        HealthSystem.tryUseHealthModifierItem(event, player, itemInHand);
     }
 
     private void dropItemsToFloor(ServerPlayer player) {

@@ -36,6 +36,9 @@ public class ModItems {
     // Revive items
     public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone", () -> new Item(new Item.Properties().stacksTo(1)));
 
+    // Mana Orb
+    public static final DeferredItem<Item> ManaOrb = ITEMS.register("mana_orb", () -> new Item(new Item.Properties()));
+
     public static void register(IEventBus eventBus){
         // Register the DeferredRegister to the event bus so blocks get registered
         ITEMS.register(eventBus);
