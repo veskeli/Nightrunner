@@ -102,7 +102,7 @@ public class HealthSystem {
             @Override
             public void useHealthModifier(ServerPlayer ownerPlayer, ItemStack itemInHand) {
                 // Restore inventory and set player stats
-                HealthModifierItem.setStats(ownerPlayer, 20.f); // Restore health with 8 hearts (16 health)
+                HealthModifierItem.setStats(ownerPlayer, 20.f);
 
                 // Consume 1 of the item
                 itemInHand.shrink(1);
@@ -118,10 +118,26 @@ public class HealthSystem {
             @Override
             public void useHealthModifier(ServerPlayer ownerPlayer, ItemStack itemInHand) {
                 // Restore inventory and set player stats
-                HealthModifierItem.setStats(ownerPlayer, 18.f); // Restore health with 8 hearts (16 health)
+                HealthModifierItem.setStats(ownerPlayer, 16.f);
 
                 // Consume 1 of the item
                 itemInHand.shrink(1);
+            }
+        },
+        ENCHANTED_GOLDEN_APPLE {
+            @Override
+            public void useHealthModifier(ServerPlayer ownerPlayer, ItemStack itemInHand) {
+                // Restore inventory and set player stats
+                HealthModifierItem.setStats(ownerPlayer, 22.f);
+
+                // Consume 1 of the item
+                itemInHand.shrink(1);
+
+                // Remove the golden apple absorption effect
+                ownerPlayer.removeEffect(MobEffects.ABSORPTION);
+
+                // Add 10 absorption hearts
+                addTemporaryHealth(ownerPlayer, 16.f, 16.f);
             }
         };
 
@@ -152,6 +168,9 @@ public class HealthSystem {
             }
             if (itemStack.is(Items.GOLDEN_CARROT)) {
                 return GOLDEN_CARROT;
+            }
+            if (itemStack.is(Items.ENCHANTED_GOLDEN_APPLE)) {
+                return ENCHANTED_GOLDEN_APPLE;
             }
             return null;  // No revival item found
         }

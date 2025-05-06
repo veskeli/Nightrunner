@@ -1,6 +1,7 @@
 package net.veskeli.nightrunner;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -32,9 +33,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
@@ -178,4 +181,29 @@ public class ModEvents {
 
         ReviveSystem.TryRevive(event, grave, interactor, itemInHand);
     }
+
+    @SubscribeEvent
+    public void onItemTooltip(ItemTooltipEvent event) {
+        ItemStack stack = event.getItemStack();
+
+        // Check if the item is golden apple
+        if (stack.getItem() == Items.GOLDEN_APPLE) {
+            event.getToolTip().add(Component.literal("Sets max health to 10 hearts").withStyle(ChatFormatting.GREEN));
+            event.getToolTip().add(Component.literal("Grants +5 temporary hearts").withStyle(ChatFormatting.GOLD));
+            event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
+        }
+        // Check if the item is golden carrot
+        else if (stack.getItem() == Items.GOLDEN_CARROT) {
+            event.getToolTip().add(Component.literal("Sets max health to 8 hearts").withStyle(ChatFormatting.GREEN));
+            event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
+        }
+        // Check if the item is enchanted golden apple
+        else if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
+            event.getToolTip().add(Component.literal("Sets max health to 11 hearts").withStyle(ChatFormatting.GREEN));
+            event.getToolTip().add(Component.literal("Grants +8 temporary hearts").withStyle(ChatFormatting.GOLD));
+            event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+
 }
