@@ -9,4 +9,6 @@ public interface IMana {
     int getMaxMana();
     int getRegenCooldown();
     void setRegenCooldown(int regenCooldown);
+    int getCurrentPenalty();
+    void subtractPenalty(int amount);
 }

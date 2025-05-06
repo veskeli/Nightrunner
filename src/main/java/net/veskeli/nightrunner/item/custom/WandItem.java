@@ -71,7 +71,7 @@ public class WandItem extends Item{
             player.getCooldowns().addCooldown(this, 20);
 
             // Subtract mana
-            mana.subtractMana(3);
+            mana.subtractMana(1);
             // set mana back to player
             player.setData(ModAttachments.PLAYER_MANA, mana);
 

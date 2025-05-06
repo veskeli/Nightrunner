@@ -20,8 +20,10 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
     private int mana = 10;
     private int maxMana = 10;
+    private int currentPenalty = 0;
+    private final int maxPenalty = 90; // When casting a spell, mana regen is disabled
     private int regenCooldown = 0;
-    private final int regenCooldownMax = 20; // 20 ticks = 1 second
+    private static final int regenCooldownMax = 30; // 20 ticks = 1 second
 
     @Override
     public int getMana() {
@@ -46,6 +48,8 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     @Override
     public void subtractMana(int amount) {
         setMana(this.mana - amount);
+
+        currentPenalty = maxPenalty; // Set penalty to max
     }
 
     @Override
@@ -75,6 +79,16 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
         mana = compoundTag.getInt("Mana");
     }
 
+    @Override
+    public int getCurrentPenalty() {
+        return currentPenalty;
+    }
+
+    @Override
+    public void subtractPenalty(int amount) {
+        currentPenalty = Math.max(0, currentPenalty - amount);
+    }
+
     @SubscribeEvent
     public static void onCustomPlayerTick(PlayerTickEvent.Post event) {
         if (event.getEntity().level().isClientSide) return;
@@ -88,8 +102,14 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
             return; // No regen during penalty
         }
 
+        // Check if player is in penalty
+        if (mana.getCurrentPenalty() > 0) {
+            mana.subtractPenalty(1);
+            return; // No regen during penalty
+        }
+
         // Only regen every 20 ticks
-        if (player.tickCount % 20 == 0 && mana.getMana() < mana.getMaxMana()) {
+        if (player.tickCount % regenCooldownMax == 0 && mana.getMana() < mana.getMaxMana()) {
             mana.addMana(1); // Regenerate 1 mana
 
             // Set mana back to player
