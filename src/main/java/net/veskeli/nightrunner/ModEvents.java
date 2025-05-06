@@ -40,6 +40,9 @@ import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
@@ -48,6 +51,9 @@ import net.veskeli.nightrunner.healthsystem.HealthStats;
 import net.veskeli.nightrunner.healthsystem.HealthSystem;
 import net.veskeli.nightrunner.healthsystem.ReviveSystem;
 import net.veskeli.nightrunner.item.ModItems;
+import net.veskeli.nightrunner.networking.ClientPayloadHandler;
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
+import net.veskeli.nightrunner.networking.ServerPayloadHandler;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -204,6 +210,5 @@ public class ModEvents {
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
         }
     }
-
 
 }

@@ -2,13 +2,26 @@ package net.veskeli.nightrunner.ManaSystem;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.veskeli.nightrunner.ModAttachments;
+import net.veskeli.nightrunner.Nightrunner;
+import net.veskeli.nightrunner.networking.ManaData;
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
 import org.jetbrains.annotations.UnknownNullability;
 
+@EventBusSubscriber(modid = Nightrunner.MODID)
 public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
-    private int mana = 100;
-    private final int maxMana = 100;
+    private int mana = 10;
+    private int maxMana = 10;
+    private int regenCooldown = 0;
+    private final int regenCooldownMax = 20; // 20 ticks = 1 second
 
     @Override
     public int getMana() {
@@ -18,6 +31,11 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     @Override
     public void setMana(int mana) {
         this.mana = Math.min(mana, maxMana);
+    }
+
+    @Override
+    public void setMaxMana(int maxMana) {
+        this.maxMana = Math.max(maxMana, 0);
     }
 
     @Override
@@ -36,6 +54,16 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     }
 
     @Override
+    public int getRegenCooldown() {
+        return regenCooldown;
+    }
+
+    @Override
+    public void setRegenCooldown(int regenCooldown) {
+        this.regenCooldown = Math.max(0, regenCooldown);
+    }
+
+    @Override
     public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("Mana", mana);
@@ -45,5 +73,39 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag compoundTag) {
         mana = compoundTag.getInt("Mana");
+    }
+
+    @SubscribeEvent
+    public static void onCustomPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity().level().isClientSide) return;
+
+        Player player = event.getEntity();
+        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+
+        // Tick regen cooldown if active
+        if (mana.getRegenCooldown() > 0) {
+            mana.setRegenCooldown(mana.getRegenCooldown() - 1);
+            return; // No regen during penalty
+        }
+
+        // Only regen every 20 ticks
+        if (player.tickCount % 20 == 0 && mana.getMana() < mana.getMaxMana()) {
+            mana.addMana(1); // Regenerate 1 mana
+
+            // Set mana back to player
+            player.setData(ModAttachments.PLAYER_MANA, mana);
+
+            System.out.println("Mana: " + mana.getMana() + "/" + mana.getMaxMana());
+
+            if (player instanceof ServerPlayer serverPlayer) {
+                // Send mana to client
+                ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana());
+                PacketDistributor.sendToPlayer(serverPlayer, pkt);
+            }
+            else {
+                // Handle the case where player is not a ServerPlayer
+                System.out.println("Player is not a ServerPlayer");
+            }
+        }
     }
 }

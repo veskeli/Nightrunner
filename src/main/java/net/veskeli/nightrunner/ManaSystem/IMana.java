@@ -3,7 +3,10 @@ package net.veskeli.nightrunner.ManaSystem;
 public interface IMana {
     int getMana();
     void setMana(int mana);
+    void setMaxMana(int maxMana);
     void addMana(int amount);
     void subtractMana(int amount);
     int getMaxMana();
+    int getRegenCooldown();
+    void setRegenCooldown(int regenCooldown);
 }

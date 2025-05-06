@@ -4,28 +4,20 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.world.entity.monster.Ghast;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.veskeli.nightrunner.ManaSystem.ManaEvents;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
+import net.veskeli.nightrunner.networking.ClientPayloadHandler;
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
+import net.veskeli.nightrunner.networking.ServerPayloadHandler;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -38,10 +30,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Nightrunner.MODID)
@@ -66,7 +54,13 @@ public class Nightrunner
 
         NeoForge.EVENT_BUS.register(new ModEvents());
 
+        NeoForge.EVENT_BUS.register(new ClientEvents());
+
+        //ClientEvents.register(modEventBus);
+
         //NeoForge.EVENT_BUS.register(new ManaEvents());
+
+        //ModNetworkEvents.register(modEventBus);
 
         // Register the mod entities
         ModEntities.register(modEventBus);
@@ -85,6 +79,8 @@ public class Nightrunner
 
         // Register the attachments
         ModAttachments.register(modEventBus);
+
+        //modEventBus.addListener(ModEventSubscriber::register);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
@@ -126,5 +122,19 @@ public class Nightrunner
         public static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
             event.put(ModEntities.MULTI_GHAST.get(), Ghast.createAttributes().build());
         }
+
+
+        /*
+        public static void register(final RegisterPayloadHandlersEvent event) {
+            final PayloadRegistrar registrar = event.registrar("1");
+            registrar.playBidirectional(
+                    ManaSyncPacket.TYPE,
+                    ManaSyncPacket.STREAM_CODEC,
+                    new DirectionalPayloadHandler<>(
+                            ClientPayloadHandler::handleDataOnMain,
+                            ServerPayloadHandler::handleDataOnMain
+                    )
+            );
+        }*/
     }
 }

@@ -2,6 +2,7 @@ package net.veskeli.nightrunner.item.custom;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -18,11 +19,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 import net.veskeli.nightrunner.item.properties.WandItemProperties;
+import net.veskeli.nightrunner.networking.ManaData;
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -43,7 +47,13 @@ public class WandItem extends Item{
     {
         ItemStack itemStack = player.getItemInHand(hand);
 
+        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+
         if (!level.isClientSide()) {
+            if(mana.getMana() < 1) {
+                return InteractionResultHolder.fail(itemStack);
+            }
+
             // Summon the WandProjectile
             WandProjectile projectile = new WandProjectile(ModEntities.WAND_PROJECTILE.get(), level);
             projectile.setCustomProperties(player,power, aoeRadius);
@@ -59,6 +69,27 @@ public class WandItem extends Item{
 
             // Apply use time
             player.getCooldowns().addCooldown(this, 20);
+
+            // Subtract mana
+            mana.subtractMana(3);
+            // set mana back to player
+            player.setData(ModAttachments.PLAYER_MANA, mana);
+
+            System.out.println("Mana: " + mana.getMana() + " Max Mana: " + mana.getMaxMana());
+
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            // Send mana to client
+            ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana());
+            PacketDistributor.sendToPlayer(serverPlayer, pkt);
+        }
+        else
+        {
+            if(mana.getMana() < 1) {
+                // Send message to player
+                player.sendSystemMessage(Component.literal("Mana is empty!"));
+                // play sound effect
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
+            }
         }
 
         return InteractionResultHolder.success(itemStack);
