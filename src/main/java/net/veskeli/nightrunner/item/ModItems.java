@@ -1,7 +1,11 @@
 package net.veskeli.nightrunner.item;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -10,6 +14,8 @@ import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.item.custom.WandItem;
 import net.veskeli.nightrunner.item.properties.WandItemProperties;
+
+import java.util.List;
 
 public class ModItems {
     // Create a DeferredRegister to hold our items
@@ -39,10 +45,24 @@ public class ModItems {
 
     // Heart fruit
     public static final DeferredItem<Item> HeartFruit = ITEMS.register("heart_fruit",
-            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build())));
+            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build()))
+            {
+                @Override
+                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.heart_fruit.tooltip").withStyle(ChatFormatting.GRAY));
+                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+                }
+            });
     // Heart fruit plus
     public static final DeferredItem<Item> HeartFruitPlus = ITEMS.register("heart_fruit_plus",
-            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build())));
+            () -> new Item(new Item.Properties().food(new FoodProperties.Builder().alwaysEdible().build()))
+            {
+                @Override
+                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.heart_fruit_plus.tooltip").withStyle(ChatFormatting.GRAY));
+                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+                }
+            });
 
     // Mana Orb
     public static final DeferredItem<Item> ManaOrb = ITEMS.register("mana_orb", () -> new Item(new Item.Properties()));

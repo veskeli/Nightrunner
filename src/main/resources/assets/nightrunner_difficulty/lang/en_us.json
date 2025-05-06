@@ -18,7 +18,10 @@
     "entity.nightrunner_difficulty.grave": "Grave",
 
     "item.nightrunner_difficulty.heart_fruit": "Heart Fruit",
+    "tooltip.nightrunner_difficulty.heart_fruit.tooltip":  "On consumption, gives half a heart of temporary health.\n\nMaximum 1 extra heart\nCan be used to craft Heart Fruit plus.",
     "item.nightrunner_difficulty.heart_fruit_plus": "Heart Fruit plus",
+    "tooltip.nightrunner_difficulty.heart_fruit_plus.tooltip":  "On consumption, gives one and half hearts of temporary health.\n\nMaximum 3 extra hearts\n",
 
     "item.nightrunner_difficulty.mana_orb": "Mana Orb"
+
 }
