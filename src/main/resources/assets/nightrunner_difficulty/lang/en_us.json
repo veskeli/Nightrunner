@@ -13,6 +13,9 @@
     "tooltip.nightrunner_difficulty.staff.tooltip" : "NOT FUNCTIONAL YET",
 
     "item.nightrunner_difficulty.soulstone": "Soulstone",
+    "tooltip.nightrunner_difficulty.soulstone.tooltip1": "Use on a grave to revive a dead player.",
+    "tooltip.nightrunner_difficulty.soulstone.tooltip2": "Revived player returns with a max of 8 hearts.",
+    "tooltip.nightrunner_difficulty.soulstone.tooltip3": "Consumed upon use.",
 
     "creativetab.nightrunner_difficulty.nightrunner_items": "Nightrunner Items",
 

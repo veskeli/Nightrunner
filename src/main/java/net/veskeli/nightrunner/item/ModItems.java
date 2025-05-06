@@ -42,7 +42,17 @@ public class ModItems {
     public static final DeferredItem<Item> DiamondStaff = ITEMS.register("diamond_staff", () -> new StaffItem(new Item.Properties().durability(1561)));
 
     // Revive items
-    public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone",
+            () -> new Item(new Item.Properties().stacksTo(1))
+            {
+                @Override
+                public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip1").withStyle(ChatFormatting.GRAY));
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip2").withStyle(ChatFormatting.GREEN));
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip3").withStyle(ChatFormatting.GRAY));
+                    super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+                }
+            });
 
     // Heart fruit
     public static final DeferredItem<Item> HeartFruit = ITEMS.register("heart_fruit",
