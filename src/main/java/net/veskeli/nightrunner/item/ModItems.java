@@ -12,6 +12,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.ModEntities;
+import net.veskeli.nightrunner.item.custom.StaffItem;
 import net.veskeli.nightrunner.item.custom.WandItem;
 import net.veskeli.nightrunner.item.properties.WandItemProperties;
 
@@ -34,11 +35,11 @@ public class ModItems {
             () -> new WandItem((WandItemProperties) new WandItemProperties().power(6.0f).aoeRadius(2.0f).durability(1561)));
 
     // Staffs
-    public static final DeferredItem<Item> WoodenStaff = ITEMS.register("wooden_staff", () -> new Item(new Item.Properties().durability(59)));
-    public static final DeferredItem<Item> StoneStaff = ITEMS.register("stone_staff", () -> new Item(new Item.Properties().durability(131)));
-    public static final DeferredItem<Item> GoldStaff = ITEMS.register("gold_staff", () -> new Item(new Item.Properties().durability(32)));
-    public static final DeferredItem<Item> IronStaff = ITEMS.register("iron_staff", () -> new Item(new Item.Properties().durability(250)));
-    public static final DeferredItem<Item> DiamondStaff = ITEMS.register("diamond_staff", () -> new Item(new Item.Properties().durability(1561)));
+    public static final DeferredItem<Item> WoodenStaff = ITEMS.register("wooden_staff", () -> new StaffItem(new Item.Properties().durability(59)));
+    public static final DeferredItem<Item> StoneStaff = ITEMS.register("stone_staff", () -> new StaffItem(new Item.Properties().durability(131)));
+    public static final DeferredItem<Item> GoldStaff = ITEMS.register("gold_staff", () -> new StaffItem(new Item.Properties().durability(32)));
+    public static final DeferredItem<Item> IronStaff = ITEMS.register("iron_staff", () -> new StaffItem(new Item.Properties().durability(250)));
+    public static final DeferredItem<Item> DiamondStaff = ITEMS.register("diamond_staff", () -> new StaffItem(new Item.Properties().durability(1561)));
 
     // Revive items
     public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone", () -> new Item(new Item.Properties().stacksTo(1)));

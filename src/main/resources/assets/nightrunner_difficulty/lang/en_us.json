@@ -10,6 +10,7 @@
     "item.nightrunner_difficulty.gold_staff": "Gold Staff",
     "item.nightrunner_difficulty.iron_staff": "Iron Staff",
     "item.nightrunner_difficulty.diamond_staff": "Diamond Staff",
+    "tooltip.nightrunner_difficulty.staff.tooltip" : "NOT FUNCTIONAL YET",
 
     "item.nightrunner_difficulty.soulstone": "Soulstone",
 
@@ -20,7 +21,7 @@
     "item.nightrunner_difficulty.heart_fruit": "Heart Fruit",
     "tooltip.nightrunner_difficulty.heart_fruit.tooltip":  "On consumption, gives half a heart of temporary health.\n\nMaximum 1 extra heart\nCan be used to craft Heart Fruit plus.",
     "item.nightrunner_difficulty.heart_fruit_plus": "Heart Fruit plus",
-    "tooltip.nightrunner_difficulty.heart_fruit_plus.tooltip":  "On consumption, gives one and half hearts of temporary health.\n\nMaximum 3 extra hearts\n",
+    "tooltip.nightrunner_difficulty.heart_fruit_plus.tooltip":  "On consumption, gives one and half hearts of temporary health.\n\nMaximum 3 extra hearts",
 
     "item.nightrunner_difficulty.mana_orb": "Mana Orb"
 
