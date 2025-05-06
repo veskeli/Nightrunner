@@ -3,17 +3,18 @@ package net.veskeli.nightrunner.entity.projectile;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.veskeli.nightrunner.entity.ModEntities;
 
 import java.util.List;
 
@@ -21,13 +22,15 @@ public class WandProjectile extends AbstractHurtingProjectile {
 
     private double baseDamage = 2.0;
     private float aoeDistance = 1.0f;
+    private Player owner;
 
     public WandProjectile(EntityType<? extends WandProjectile> type, Level level) {
         super(type, level);
     }
 
-    public void setCustomProperties(float damage, float aoeDistance)
+    public void setCustomProperties(Player serverPlayer, float damage, float aoeDistance)
     {
+        this.owner = serverPlayer;
         this.baseDamage = damage;
         this.aoeDistance = aoeDistance;
     }
@@ -42,6 +45,13 @@ public class WandProjectile extends AbstractHurtingProjectile {
 
         // Damage the entity
         result.getEntity().hurt(damagesource, (float) d0);
+
+        // Set the last damage source to the owner
+        if (result.getEntity() instanceof LivingEntity) {
+            LivingEntity target = (LivingEntity) result.getEntity();
+            target.setLastHurtByMob(this.owner);
+            target.setLastHurtMob(this.owner);
+        }
 
         this.discard(); // Remove projectile on hit
     }

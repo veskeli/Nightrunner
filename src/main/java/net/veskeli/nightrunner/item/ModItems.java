@@ -43,7 +43,7 @@ public class ModItems {
 
     // Revive items
     public static final DeferredItem<Item> Soulstone = ITEMS.register("soulstone",
-            () -> new Item(new Item.Properties().stacksTo(1))
+            () -> new Item(new Item.Properties().stacksTo(3))
             {
                 @Override
                 public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

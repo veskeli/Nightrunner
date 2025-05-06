@@ -88,14 +88,14 @@ public class ModEvents {
         SummonGraveForPlayer(player);
 
         // Drop items to the floor (inventory)
-        dropItemsToFloor(player);
+        //dropItemsToFloor(player);
 
         // Drop experience orbs (player's experience)
-        dropExperience(player);
+        //dropExperience(player);
 
         // Store inventory
         //GraveDataStore.storeInventory(player.getUUID(), new ArrayList<>(player.getInventory().items));
-        player.getInventory().clearContent();
+        //player.getInventory().clearContent();
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)

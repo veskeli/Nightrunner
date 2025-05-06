@@ -46,7 +46,7 @@ public class WandItem extends Item{
         if (!level.isClientSide()) {
             // Summon the WandProjectile
             WandProjectile projectile = new WandProjectile(ModEntities.WAND_PROJECTILE.get(), level);
-            projectile.setCustomProperties(power, aoeRadius);
+            projectile.setCustomProperties(player,power, aoeRadius);
             projectile.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
             projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 3.0F); // same speed as arrow
             level.addFreshEntity(projectile);
@@ -60,14 +60,6 @@ public class WandItem extends Item{
             // Apply use time
             player.getCooldowns().addCooldown(this, 20);
         }
-
-        // reduce mana
-        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
-        mana.subtractMana(1);
-        player.setData(ModAttachments.PLAYER_MANA, mana);
-
-        // print mana to action bar
-        player.displayClientMessage(Component.literal("Mana: " + mana.getMana()), true);
 
         return InteractionResultHolder.success(itemStack);
     }
