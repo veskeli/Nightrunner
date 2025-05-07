@@ -113,20 +113,19 @@ public class Nightrunner
             EntityRenderers.register(ModEntities.MULTI_GHAST.get(), GhastRenderer::new);
         }
 
-        /*
-        // Key mapping is lazily initialized so it doesn't exist until it is registered
-        public static final Lazy<KeyMapping> PRONE_MAPPING = Lazy.of(() -> new KeyMapping(
-                "key.nightrunner_difficulty.prone",
+        // Key mapping for skill tree
+        public static final Lazy<KeyMapping> SKILL_TREE_MAPPING = Lazy.of(() -> new KeyMapping(
+                "key.nightrunner_difficulty.skill_tree",
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_Z,
+                GLFW.GLFW_KEY_I,
                 "key.categories.nightrunner"
         ));
 
         // Event is on the mod event bus only on the physical client
         @SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
-            event.register(PRONE_MAPPING.get());
-        }*/
+            event.register(SKILL_TREE_MAPPING.get());
+        }
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)

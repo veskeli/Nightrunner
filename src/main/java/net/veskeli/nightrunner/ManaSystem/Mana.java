@@ -21,7 +21,7 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     private int mana = 10;
     private int maxMana = 10;
     private int currentPenalty = 0;
-    private final int maxPenalty = 90; // When casting a spell, mana regen is disabled
+    private final int maxPenalty = 30; // When casting a spell, mana regen is disabled
     private int regenCooldown = 0;
     private static final int regenCooldownMax = 30; // 20 ticks = 1 second
 

@@ -1,0 +1,16 @@
+{
+  "parent": "nightrunner_difficulty:classes_tab",
+  "display": {
+    "icon": { "item": "minecraft:fire_charge" },
+    "title": { "text": "Mage class" },
+    "description": { "text": "Unlock class" },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "dummy": { "trigger": "minecraft:impossible" }
+  },
+  "requirements": [ ["dummy"] ]
+}
