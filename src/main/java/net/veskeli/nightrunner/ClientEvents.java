@@ -2,6 +2,7 @@ package net.veskeli.nightrunner;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
@@ -11,6 +12,10 @@ public class ClientEvents {
 
     @SubscribeEvent
     public void onPlayerTick(PlayerTickEvent.Post event) {
+        ShowManaWhenHoldingCorrectItem(event);
+    }
+
+    private static void ShowManaWhenHoldingCorrectItem(PlayerTickEvent.Post event) {
         // return if server side
         if (!event.getEntity().level().isClientSide()) {
             return;
@@ -20,16 +25,27 @@ public class ClientEvents {
         {
             // Get the mana data from the player
             Mana mana = event.getEntity().getData(ModAttachments.PLAYER_MANA);
+            MutableComponent manaText = Component.literal("Mana: ").withStyle(style -> style.withColor(ChatFormatting.AQUA).withBold(true))
+                    .append(Component.literal(String.valueOf(mana.getMana()))
+                            .withStyle(style -> style.withColor(ChatFormatting.BLUE).withBold(true)))
+                    .append(Component.literal(" / ")
+                            .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
+                    .append(Component.literal(String.valueOf(mana.getMaxMana()))
+                            .withStyle(style -> style.withColor(ChatFormatting.GREEN).withBold(true)));
+
+            if (mana.getMana() < mana.getMaxMana()) {
+                manaText.append(Component.literal(" ⏳ ")
+                                .withStyle(style -> style.withColor(ChatFormatting.GOLD)))
+                        .append(Component.literal(String.valueOf(mana.getCurrentRecharge()))
+                                .withStyle(style -> style.withColor(ChatFormatting.YELLOW).withBold(false)))
+                        .append(Component.literal("t")
+                                .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
+            }
+
+            event.getEntity().displayClientMessage(manaText, true);
+
             // Show mana on action bar
-            event.getEntity().displayClientMessage(
-                    Component.literal("Mana: ")
-                            .append(Component.literal(String.valueOf(mana.getMana()))
-                                    .withStyle(style -> style.withColor(ChatFormatting.BLUE).withBold(true)))
-                            .append(Component.literal(" / ")
-                                    .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
-                            .append(Component.literal(String.valueOf(mana.getMaxMana()))
-                                    .withStyle(style -> style.withColor(ChatFormatting.GREEN).withBold(true))),
-                                    true);
+            event.getEntity().displayClientMessage(manaText, true);
         }
     }
 }

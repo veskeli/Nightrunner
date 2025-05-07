@@ -26,6 +26,8 @@
     "item.nightrunner_difficulty.heart_fruit_plus": "Heart Fruit plus",
     "tooltip.nightrunner_difficulty.heart_fruit_plus.tooltip":  "On consumption, gives one and half hearts of temporary health.\n\nMaximum 3 extra hearts",
 
-    "item.nightrunner_difficulty.mana_orb": "Mana Orb"
+    "item.nightrunner_difficulty.mana_orb": "Mana Orb",
 
+    "key.nightrunner_difficulty.prone": "Prone",
+    "key.categories.nightrunner": "Nightrunner"
 }

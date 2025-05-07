@@ -89,12 +89,36 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
         currentPenalty = Math.max(0, currentPenalty - amount);
     }
 
+    @Override
+    public int getCurrentRecharge() {
+        // Return penalty if active
+        if(currentPenalty > 0) {
+            return currentPenalty + regenCooldown;
+        }
+        // Else return regen cooldown
+        return regenCooldown;
+    }
+
     @SubscribeEvent
     public static void onCustomPlayerTick(PlayerTickEvent.Post event) {
-        if (event.getEntity().level().isClientSide) return;
-
         Player player = event.getEntity();
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+
+        // Return if mana is full
+        if (mana.getMana() >= mana.getMaxMana()) {
+            return;
+        }
+
+        if (event.getEntity().level().isClientSide)
+        {
+            // In the client we can tick down the cooldown.
+            // As when we set the cooldown on the server we send it to client
+            // and the client will tick it down. So player will see the cooldown
+            // on the client side.
+            mana.setRegenCooldown(mana.getRegenCooldown() - 1);
+            player.setData(ModAttachments.PLAYER_MANA, mana);
+            return;
+        }
 
         // Tick regen cooldown if active
         if (mana.getRegenCooldown() > 0) {
@@ -108,18 +132,20 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
             return; // No regen during penalty
         }
 
-        // Only regen every 20 ticks
-        if (player.tickCount % regenCooldownMax == 0 && mana.getMana() < mana.getMaxMana()) {
+        if (mana.getRegenCooldown() <=0 ) {
             mana.addMana(1); // Regenerate 1 mana
+
+            // If mana is not full, reset cooldown
+            if (mana.getMana() < mana.getMaxMana()) {
+                mana.setRegenCooldown(regenCooldownMax);
+            }
 
             // Set mana back to player
             player.setData(ModAttachments.PLAYER_MANA, mana);
 
-            System.out.println("Mana: " + mana.getMana() + "/" + mana.getMaxMana());
-
             if (player instanceof ServerPlayer serverPlayer) {
                 // Send mana to client
-                ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana());
+                ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana(), mana.getCurrentRecharge());
                 PacketDistributor.sendToPlayer(serverPlayer, pkt);
             }
             else {

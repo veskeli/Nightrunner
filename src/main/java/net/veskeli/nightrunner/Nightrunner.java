@@ -1,19 +1,18 @@
 package net.veskeli.nightrunner;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.world.entity.monster.Ghast;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
-import net.veskeli.nightrunner.networking.ClientPayloadHandler;
-import net.veskeli.nightrunner.networking.ManaSyncPacket;
-import net.veskeli.nightrunner.networking.ServerPayloadHandler;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -113,6 +112,21 @@ public class Nightrunner
 
             EntityRenderers.register(ModEntities.MULTI_GHAST.get(), GhastRenderer::new);
         }
+
+        /*
+        // Key mapping is lazily initialized so it doesn't exist until it is registered
+        public static final Lazy<KeyMapping> PRONE_MAPPING = Lazy.of(() -> new KeyMapping(
+                "key.nightrunner_difficulty.prone",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_Z,
+                "key.categories.nightrunner"
+        ));
+
+        // Event is on the mod event bus only on the physical client
+        @SubscribeEvent
+        public static void registerBindings(RegisterKeyMappingsEvent event) {
+            event.register(PRONE_MAPPING.get());
+        }*/
     }
 
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD)

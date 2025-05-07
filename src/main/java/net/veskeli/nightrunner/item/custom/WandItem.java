@@ -75,11 +75,9 @@ public class WandItem extends Item{
             // set mana back to player
             player.setData(ModAttachments.PLAYER_MANA, mana);
 
-            System.out.println("Mana: " + mana.getMana() + " Max Mana: " + mana.getMaxMana());
-
             ServerPlayer serverPlayer = (ServerPlayer) player;
             // Send mana to client
-            ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana());
+            ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana(), mana.getCurrentRecharge());
             PacketDistributor.sendToPlayer(serverPlayer, pkt);
         }
         else

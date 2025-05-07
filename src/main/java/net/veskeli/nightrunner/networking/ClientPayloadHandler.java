@@ -10,19 +10,17 @@ public class ClientPayloadHandler {
     public static void handleDataOnMain(final ManaSyncPacket data, final IPayloadContext context) {
         // Get the player entity from the context
         Player player = context.player();
-        // Check if the player is null
-        if (player == null) {
-            return;
-        }
+        // Make sure this is client
+        if(!player.level().isClientSide()) return;
+
         // Get the mana data from the player
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
         // Update the mana data
-        if (mana != null) {
-            mana.setMana(data.currentMana());
-            mana.setMaxMana(data.maxMana());
+        mana.setMana(data.currentMana());
+        mana.setMaxMana(data.maxMana());
+        mana.setRegenCooldown(data.currentRecharge());
 
-            // Update the player data
-            player.setData(ModAttachments.PLAYER_MANA, mana);
-        }
+        // Update the player data
+        player.setData(ModAttachments.PLAYER_MANA, mana);
     }
 }

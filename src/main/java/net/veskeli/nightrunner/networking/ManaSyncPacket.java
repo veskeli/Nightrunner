@@ -7,7 +7,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.veskeli.nightrunner.Nightrunner;
 
-public record ManaSyncPacket(int currentMana, int maxMana) implements CustomPacketPayload {
+public record ManaSyncPacket(int currentMana, int maxMana, int currentRecharge) implements CustomPacketPayload {
 
     public static final CustomPacketPayload.Type<ManaSyncPacket> TYPE =
             new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "mana_sync"));
@@ -17,6 +17,8 @@ public record ManaSyncPacket(int currentMana, int maxMana) implements CustomPack
             ManaSyncPacket::currentMana,
             ByteBufCodecs.VAR_INT,
             ManaSyncPacket::maxMana,
+            ByteBufCodecs.VAR_INT,
+            ManaSyncPacket::currentRecharge,
             ManaSyncPacket::new
     );
 

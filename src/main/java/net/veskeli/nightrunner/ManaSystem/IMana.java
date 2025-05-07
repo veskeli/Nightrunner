@@ -11,4 +11,5 @@ public interface IMana {
     void setRegenCooldown(int regenCooldown);
     int getCurrentPenalty();
     void subtractPenalty(int amount);
+    int getCurrentRecharge();
 }
