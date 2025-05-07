@@ -30,6 +30,8 @@
 
     "key.nightrunner_difficulty.skill_tree": "Open Skill Tree",
 
+    "gui.nightrunner.skill_tree.title": "Skill Tree",
+
     "key.nightrunner_difficulty.prone": "Prone",
     "key.categories.nightrunner": "Nightrunner"
 }

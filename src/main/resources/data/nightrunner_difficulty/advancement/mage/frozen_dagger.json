@@ -1,0 +1,17 @@
+{
+  "display": {
+    "icon": {
+      "id": "ice"
+    },
+    "title": "Frozen Dagger",
+    "description": "unlocks the spell \"Ice Knife\"",
+    "frame": "task",
+    "hidden": false
+  },
+  "parent": "nightrunner_difficulty:classes/mage_class",
+  "criteria": {
+    "dummy": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:netherite_sword"
+    },
+    "title": "Fighter",
+    "description": "Unlocks fighter class",
+    "frame": "goal",
+    "show_toast": true,
+    "hidden": false
+  },
+  "parent": "nightrunner_difficulty:root",
+  "criteria": {
+    "dummy": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

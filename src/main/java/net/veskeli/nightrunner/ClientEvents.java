@@ -40,6 +40,7 @@ public class ClientEvents {
             return;
         }
         if (SKILL_TREE_MAPPING.get().consumeClick()) {
+            /*
             // 1) Get the current advancement tree
             ClientAdvancements advancements = mc.player.connection.getAdvancements();
 
@@ -56,7 +57,7 @@ public class ClientEvents {
 
             // 3) Remove them
             tree.remove(toRemove);
-
+*/
             // 4) Create a new screen with the modified tree
             mc.setScreen(new SkillTreeScreen(mc.player.connection.getAdvancements()));
         }
