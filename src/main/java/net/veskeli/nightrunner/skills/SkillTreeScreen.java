@@ -66,7 +66,15 @@ public class SkillTreeScreen extends Screen {
             double angle = Math.toRadians(i * 60); // 0°, 60°, ..., 300°
             int x = (int) (centerX + 8 + radius * Math.cos(angle)) - 8;
             int y = (int) (centerY + 8 + radius * Math.sin(angle)) - 8;
-            addRenderableWidget(new SkillTreeWidget(x, y, 16, 16, SKILL_TREE_LIST[i]));
+            SkillTreeWidget skillWidget = new SkillTreeWidget(x, y, 16, 16, SKILL_TREE_LIST[i]);
+            // bind on click event
+            skillWidget.onMouseClick(() -> {
+                // Call your custom function here
+
+            });
+            addRenderableWidget(skillWidget);
+
+
         }
     }
 
@@ -94,7 +102,7 @@ public class SkillTreeScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 
         // Render the background
-        renderBg(guiGraphics, partialTick, mouseX, mouseY);
+        //renderBg(guiGraphics, partialTick, mouseX, mouseY);
 
         // Render the title
         int x = (width - imageWidth) / 2;
@@ -107,7 +115,7 @@ public class SkillTreeScreen extends Screen {
         int blue = 255; // Blue
         int color = (alpha << 24) | (red << 16) | (green << 8) | blue;
 
-        guiGraphics.drawString(Minecraft.getInstance().font, "Skill Tree", x + 4, y + 4, color);
+        //guiGraphics.drawString(Minecraft.getInstance().font, "Skill Tree", x + 4, y + 4, color);
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
     }

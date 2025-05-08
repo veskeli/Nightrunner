@@ -52,6 +52,11 @@ public class SkillTreeWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
+        onMouseClick();
         super.onClick(mouseX, mouseY, button);
+    }
+
+    public void onMouseClick() {
+
     }
 }
