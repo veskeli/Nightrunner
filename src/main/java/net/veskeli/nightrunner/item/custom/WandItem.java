@@ -57,10 +57,9 @@ public class WandItem extends Item{
 
         if(spell != null)
         {
+            if(player.level().isClientSide()) return InteractionResultHolder.success(itemStack);
             // Cast the spell
-
-            // For now, just print the spell name
-            System.out.println("Casting spell: " + spell.getName() + "Server: " + !level.isClientSide());
+            spell.castSpell(level,player, hand);
 
             return InteractionResultHolder.success(itemStack);
         }

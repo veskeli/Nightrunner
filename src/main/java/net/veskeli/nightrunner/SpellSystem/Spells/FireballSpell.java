@@ -1,6 +1,11 @@
 package net.veskeli.nightrunner.SpellSystem.Spells;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.SpellSystem.Spell;
 
@@ -10,6 +15,21 @@ public class FireballSpell extends Spell {
 
     public FireballSpell() {
         super();
+    }
+
+    @Override
+    public void castSpell(Level level, Player player, InteractionHand hand) {
+        super.castSpell(level, player, hand);
+
+        Vec3 vec3 = player.getLookAngle();
+
+        // Speed it up
+        vec3 = vec3.scale(8.0); // Adjust the speed multiplier as needed
+
+        // Summon a fireball entity
+        LargeFireball fireball = new LargeFireball(level, player, vec3, 3);
+        fireball.setPos(player.getX(), player.getY() + 1.0, player.getZ());
+        level.addFreshEntity(fireball);
     }
 
     @Override
