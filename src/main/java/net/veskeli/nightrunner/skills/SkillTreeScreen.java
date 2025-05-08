@@ -12,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.veskeli.nightrunner.Nightrunner;
 
+import java.util.Arrays;
+
 public class SkillTreeScreen extends Screen {
 
     private final int imageWidth = 176;
@@ -24,12 +26,19 @@ public class SkillTreeScreen extends Screen {
 
     private static final ResourceLocation SKILL_TREE_EXAMPLE =
             ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/bottle_of_experience.png");
+    private final ResourceLocation CENTER_SKILL =
+            ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/bottle_of_experience.png");
+    private final ResourceLocation[] SKILL_TREE_LIST;
 
     public SkillTreeScreen() {
         super(Component.literal("Skill Tree"));
 
         // update local coordinates
         updateLocalCoordinates();
+
+        // Initialize the skill tree list
+        SKILL_TREE_LIST = new ResourceLocation[6];
+        Arrays.fill(SKILL_TREE_LIST, SKILL_TREE_EXAMPLE);
     }
 
     private void updateLocalCoordinates() {
@@ -43,8 +52,22 @@ public class SkillTreeScreen extends Screen {
         // Update local coordinates
         updateLocalCoordinates();
 
-        SkillTreeWidget skillTreeWidget = new SkillTreeWidget(localX, localY, 16, 16, SKILL_TREE_EXAMPLE);
-        addRenderableWidget(skillTreeWidget);
+        int centerX = width / 2 - 8;
+        int centerY = height / 2 - 8;
+
+        // Add center skill
+        addRenderableWidget(new SkillTreeWidget(centerX, centerY, 16, 16, CENTER_SKILL));
+
+        // Calculate radius as 40% of the smaller dimension
+        double radius = 0.4 * Math.min(imageWidth, imageHeight);
+
+        // Add 6 surrounding skills in a circle
+        for (int i = 0; i < 6; i++) {
+            double angle = Math.toRadians(i * 60); // 0°, 60°, ..., 300°
+            int x = (int) (centerX + 8 + radius * Math.cos(angle)) - 8;
+            int y = (int) (centerY + 8 + radius * Math.sin(angle)) - 8;
+            addRenderableWidget(new SkillTreeWidget(x, y, 16, 16, SKILL_TREE_LIST[i]));
+        }
     }
 
     @Override
