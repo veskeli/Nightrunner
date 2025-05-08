@@ -1,41 +1,103 @@
 package net.veskeli.nightrunner.skills;
 
-import net.minecraft.advancements.Advancement;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.advancements.AdvancementTab;
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
-import net.minecraft.client.multiplayer.ClientAdvancements;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.veskeli.nightrunner.Nightrunner;
 
-import java.lang.reflect.Field;
-import java.util.Map;
+public class SkillTreeScreen extends Screen {
 
-public class SkillTreeScreen extends AdvancementsScreen {
-    public SkillTreeScreen(ClientAdvancements advancements) {
-        super(advancements);
+    private final int imageWidth = 176;
+    private final int imageHeight = 166;
+    private int localX;
+    private int localY;
 
-        // remove all tabs not from our mod’s namespace
-        try {
-            Field tabsField = AdvancementsScreen.class.getDeclaredField("tabs");
-            tabsField.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            Map<Advancement, AdvancementTab> tabs =
-                    (Map<Advancement, AdvancementTab>) tabsField.get(this);
-            /*tabs.entrySet().removeIf(e ->
-                    !e.getKey().name()
-            );*/ // !e.getKey().getId().getNamespace().equals("nightrunner_difficulty")
-            System.out.println("Tabs: " + tabs.size());
-            // Print names
-            for (Map.Entry<Advancement, AdvancementTab> entry : tabs.entrySet()) {
-                System.out.println("Advancement: " + entry.getKey().name());
-            }
-        } catch (ReflectiveOperationException ex) {
-            ex.printStackTrace();
-        }
+    private static final ResourceLocation SKILL_TREE_TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/gui/testing_gui.png");
+
+    private static final ResourceLocation SKILL_TREE_EXAMPLE =
+            ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/bottle_of_experience.png");
+
+    public SkillTreeScreen() {
+        super(Component.literal("Skill Tree"));
+
+        // update local coordinates
+        updateLocalCoordinates();
+    }
+
+    private void updateLocalCoordinates() {
+        localX = (width - imageWidth) / 2;
+        localY = (height - imageHeight) / 2;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        // Update local coordinates
+        updateLocalCoordinates();
+
+        SkillTreeWidget skillTreeWidget = new SkillTreeWidget(localX, localY, 16, 16, SKILL_TREE_EXAMPLE);
+        addRenderableWidget(skillTreeWidget);
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        super.resize(minecraft, width, height);
+        // Reinitialize the screen with the new dimensions
+        this.width = width;
+        this.height = height;
+        this.init();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // Convert to local space
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+        int localMouseX = (int) (mouseX - x);
+        int localMouseY = (int) (mouseY - y);
+
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+
+        // Render the background
+        renderBg(guiGraphics, partialTick, mouseX, mouseY);
+
+        // Render the title
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+
+        // Set the color to white with full opacity
+        int alpha = 255; // Full opacity
+        int red = 255; // Red
+        int green = 255; // Green
+        int blue = 255; // Blue
+        int color = (alpha << 24) | (red << 16) | (green << 8) | blue;
+
+        guiGraphics.drawString(Minecraft.getInstance().font, "Skill Tree", x + 4, y + 4, color);
+
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        // TODO: Render skill points
     }
+
+    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.f, 1.f, 1.f, 1.f);
+        RenderSystem.setShaderTexture(0, SKILL_TREE_TEXTURE);
+
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+
+        guiGraphics.blit(SKILL_TREE_TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+    }
+
 }

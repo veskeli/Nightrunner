@@ -70,6 +70,9 @@ public class Nightrunner
         // Register the mod items
         ModItems.register(modEventBus);
 
+        // Register the mod menu types
+        ModMenuTypes.register(modEventBus);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
