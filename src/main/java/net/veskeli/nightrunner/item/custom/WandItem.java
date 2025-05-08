@@ -22,12 +22,15 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.ModAttachments;
+import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
+import net.veskeli.nightrunner.SpellSystem.Spell;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 import net.veskeli.nightrunner.item.properties.WandItemProperties;
 import net.veskeli.nightrunner.networking.ManaData;
 import net.veskeli.nightrunner.networking.ManaSyncPacket;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -49,6 +52,26 @@ public class WandItem extends Item{
 
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
 
+        SpellAttachment spellAttachment = player.getData(ModAttachments.PLAYER_SPELLS);
+        Spell spell = spellAttachment.getSelectedSpell();
+
+        if(spell != null)
+        {
+            // Cast the spell
+
+            // For now, just print the spell name
+            System.out.println("Casting spell: " + spell.getName() + "Server: " + !level.isClientSide());
+
+            return InteractionResultHolder.success(itemStack);
+        }
+        // If spell was not selected we use the wand spell
+        InteractionResultHolder<ItemStack> itemStack1 = useWandSpell(level, player, mana, itemStack);
+        if (itemStack1 != null) return itemStack1;
+
+        return InteractionResultHolder.success(itemStack);
+    }
+
+    protected @Nullable InteractionResultHolder<ItemStack> useWandSpell(Level level, Player player, Mana mana, ItemStack itemStack) {
         if (!level.isClientSide()) {
             if(mana.getMana() < 1) {
                 return InteractionResultHolder.fail(itemStack);
@@ -89,7 +112,6 @@ public class WandItem extends Item{
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
             }
         }
-
-        return InteractionResultHolder.success(itemStack);
+        return null;
     }
 }
