@@ -7,6 +7,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
+import net.veskeli.nightrunner.SpellSystem.Spell;
 
 public class SpellSelectorWidget extends AbstractWidget {
 
@@ -15,8 +17,12 @@ public class SpellSelectorWidget extends AbstractWidget {
     private final int height;
     private final int x;
     private final int y;
+    private SpellAttachment attachment;
+    private int index;
+    private Spell spell;
 
-    public SpellSelectorWidget(int x, int y, int width, int height, ResourceLocation texture) {
+    public SpellSelectorWidget(int x, int y, int width, int height, ResourceLocation texture, SpellAttachment attachment)
+    {
         super(x, y, width, height, Component.literal("Skill Tree Widget"));
 
         this.texture = texture;
@@ -24,6 +30,26 @@ public class SpellSelectorWidget extends AbstractWidget {
         this.height = height;
         this.x = x;
         this.y = y;
+
+        // Set the attachment to the widget
+        this.attachment = attachment;
+    }
+
+    public SpellSelectorWidget(int x, int y, int width, int height, int index, SpellAttachment attachment)
+    {
+        super(x, y, width, height, Component.literal("Skill Tree Widget"));
+
+
+        this.index = index;
+        this.spell = attachment.getSpell(index);
+        this.texture = this.spell.getSpellTexture();
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+
+        // Set the attachment to the widget
+        this.attachment = attachment;
     }
 
     @Override

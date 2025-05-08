@@ -7,6 +7,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
+import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.item.custom.WandItem;
 import net.veskeli.nightrunner.skills.SpellSelectorScreen;
 
@@ -31,9 +32,13 @@ public class ClientEvents {
             System.out.println("Minecraft instance or player is null");
             return;
         }
+
         if (SKILL_TREE_MAPPING.get().consumeClick()) {
+
+            // Get the Sell Attachment
+            SpellAttachment spellAttachment = event.getEntity().getData(ModAttachments.PLAYER_SPELLS);
             // Draw the skill tree screen
-            mc.setScreen(new SpellSelectorScreen());
+            mc.setScreen(new SpellSelectorScreen(spellAttachment));
         }
     }
 

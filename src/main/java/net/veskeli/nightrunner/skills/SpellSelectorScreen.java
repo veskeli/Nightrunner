@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.veskeli.nightrunner.Nightrunner;
+import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
+import net.veskeli.nightrunner.SpellSystem.Spell;
 
 import java.util.Arrays;
 
@@ -17,19 +19,19 @@ public class SpellSelectorScreen extends Screen {
             ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/bottle_of_experience.png");
     private final ResourceLocation CENTER_SKILL =
             ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/diamond_wand.png");
-    private final ResourceLocation[] SKILL_TREE_LIST;
+
+    private SpellAttachment attachment;
 
     @Override
     public boolean isPauseScreen() {
         return false;
     }
 
-    public SpellSelectorScreen() {
+    public SpellSelectorScreen(SpellAttachment attachment) {
         super(Component.literal("Skill Tree"));
 
-        // Initialize the skill tree list
-        SKILL_TREE_LIST = new ResourceLocation[6];
-        Arrays.fill(SKILL_TREE_LIST, SKILL_TREE_EXAMPLE);
+        // Set the attachment
+        this.attachment = attachment;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class SpellSelectorScreen extends Screen {
         int centerY = height / 2 - widgetSize / 2;
 
         // Add center skill
-        SpellSelectorWidget centerSkillWidget = new SpellSelectorWidget(centerX, centerY, widgetSize, widgetSize, CENTER_SKILL);
+        SpellSelectorWidget centerSkillWidget = new SpellSelectorWidget(centerX, centerY, widgetSize, widgetSize, CENTER_SKILL, attachment);
         // bind on click event
         centerSkillWidget.setOnClickHandler(this::onWidgetClicked);
         addRenderableWidget(centerSkillWidget);
@@ -51,13 +53,20 @@ public class SpellSelectorScreen extends Screen {
 
         // Add 6 surrounding skills in a circle
         for (int i = 0; i < 6; i++) {
+
+            Spell spell = attachment.getSpell(i);
+
             double angle = Math.toRadians(i * 60); // 0°, 60°, ..., 300°
             int x = (int) (centerX + 8 + radius * Math.cos(angle)) - 8;
             int y = (int) (centerY + 8 + radius * Math.sin(angle)) - 8;
-            SpellSelectorWidget skillWidget = new SpellSelectorWidget(x, y, widgetSize, widgetSize, SKILL_TREE_LIST[i]);
-            // bind on click event
-            skillWidget.setOnClickHandler(this::onWidgetClicked);
-            addRenderableWidget(skillWidget);
+
+            // Create the widget for the spell
+            if (spell != null) {
+                SpellSelectorWidget skillWidget = new SpellSelectorWidget(x, y, widgetSize, widgetSize, i, attachment);
+                // bind on click event
+                skillWidget.setOnClickHandler(this::onWidgetClicked);
+                addRenderableWidget(skillWidget);
+            }
         }
     }
 
