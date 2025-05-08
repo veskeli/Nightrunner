@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.SpellSystem.Spell;
@@ -21,17 +22,19 @@ public class SpellSelectorScreen extends Screen {
             ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/diamond_wand.png");
 
     private SpellAttachment attachment;
+    private Player player;
 
     @Override
     public boolean isPauseScreen() {
         return false;
     }
 
-    public SpellSelectorScreen(SpellAttachment attachment) {
+    public SpellSelectorScreen(SpellAttachment attachment, Player player) {
         super(Component.literal("Skill Tree"));
 
         // Set the attachment
         this.attachment = attachment;
+        this.player = player;
     }
 
     @Override
@@ -43,7 +46,7 @@ public class SpellSelectorScreen extends Screen {
         int centerY = height / 2 - widgetSize / 2;
 
         // Add center skill
-        SpellSelectorWidget centerSkillWidget = new SpellSelectorWidget(centerX, centerY, widgetSize, widgetSize, CENTER_SKILL, attachment);
+        SpellSelectorWidget centerSkillWidget = new SpellSelectorWidget(centerX, centerY, widgetSize, widgetSize, CENTER_SKILL, attachment, player);
         // bind on click event
         centerSkillWidget.setOnClickHandler(this::onWidgetClicked);
         addRenderableWidget(centerSkillWidget);
@@ -62,7 +65,7 @@ public class SpellSelectorScreen extends Screen {
 
             // Create the widget for the spell
             if (spell != null) {
-                SpellSelectorWidget skillWidget = new SpellSelectorWidget(x, y, widgetSize, widgetSize, i, attachment);
+                SpellSelectorWidget skillWidget = new SpellSelectorWidget(x, y, widgetSize, widgetSize, i, attachment, player);
                 // bind on click event
                 skillWidget.setOnClickHandler(this::onWidgetClicked);
                 addRenderableWidget(skillWidget);

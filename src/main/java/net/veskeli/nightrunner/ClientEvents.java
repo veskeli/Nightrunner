@@ -2,12 +2,16 @@ package net.veskeli.nightrunner;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
+import net.veskeli.nightrunner.SpellSystem.ModSpells;
+import net.veskeli.nightrunner.SpellSystem.Spell;
+import net.veskeli.nightrunner.SpellSystem.Spells.FireballSpell;
 import net.veskeli.nightrunner.item.custom.WandItem;
 import net.veskeli.nightrunner.skills.SpellSelectorScreen;
 
@@ -35,10 +39,18 @@ public class ClientEvents {
 
         if (SKILL_TREE_MAPPING.get().consumeClick()) {
 
-            // Get the Sell Attachment
+            // TEMP HARD CODED FOR TESTING
             SpellAttachment spellAttachment = event.getEntity().getData(ModAttachments.PLAYER_SPELLS);
+
+            spellAttachment.setSpell(0, ModSpells.FIREBALL.get());
+            spellAttachment.setSpell(1, ModSpells.ICEKNIFE.get());
+
+            event.getEntity().setData(ModAttachments.PLAYER_SPELLS, spellAttachment);
+
+            // Get the Sell Attachment
+            //SpellAttachment spellAttachment = event.getEntity().getData(ModAttachments.PLAYER_SPELLS);
             // Draw the skill tree screen
-            mc.setScreen(new SpellSelectorScreen(spellAttachment));
+            mc.setScreen(new SpellSelectorScreen(spellAttachment, event.getEntity()));
         }
     }
 

@@ -7,6 +7,8 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.SpellSystem.Spell;
 
@@ -20,8 +22,9 @@ public class SpellSelectorWidget extends AbstractWidget {
     private SpellAttachment attachment;
     private int index;
     private Spell spell;
+    private Player player;
 
-    public SpellSelectorWidget(int x, int y, int width, int height, ResourceLocation texture, SpellAttachment attachment)
+    public SpellSelectorWidget(int x, int y, int width, int height, ResourceLocation texture, SpellAttachment attachment, Player player)
     {
         super(x, y, width, height, Component.literal("Skill Tree Widget"));
 
@@ -31,11 +34,14 @@ public class SpellSelectorWidget extends AbstractWidget {
         this.x = x;
         this.y = y;
 
+        this.index = -1;
+
         // Set the attachment to the widget
         this.attachment = attachment;
+        this.player = player;
     }
 
-    public SpellSelectorWidget(int x, int y, int width, int height, int index, SpellAttachment attachment)
+    public SpellSelectorWidget(int x, int y, int width, int height, int index, SpellAttachment attachment, Player player)
     {
         super(x, y, width, height, Component.literal("Skill Tree Widget"));
 
@@ -50,6 +56,7 @@ public class SpellSelectorWidget extends AbstractWidget {
 
         // Set the attachment to the widget
         this.attachment = attachment;
+        this.player = player;
     }
 
     @Override
@@ -81,6 +88,30 @@ public class SpellSelectorWidget extends AbstractWidget {
             onClickHandler.onClick();
         }
         super.onClick(mouseX, mouseY, button);
+
+        if(index == -1)
+        {
+            attachment.setSelectedSpell(null);
+            System.out.println("Selected spell: null");
+        }
+        else
+        {
+            // Set selected spell
+            if (attachment != null) {
+                attachment.setSelectedSpell(spell);
+                System.out.println("Selected spell: " + spell.getName());
+            }
+            else {
+                attachment.setSelectedSpell(null);
+                System.out.println("Selected spell: null");
+            }
+        }
+
+        // Send data to player
+        if (player != null) {
+            // Send data to the player
+            player.setData(ModAttachments.PLAYER_SPELLS, attachment);
+        }
     }
 
     private OnClickHandler onClickHandler;

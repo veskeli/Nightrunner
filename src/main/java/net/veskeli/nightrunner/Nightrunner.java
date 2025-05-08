@@ -8,6 +8,8 @@ import net.minecraft.world.entity.monster.Ghast;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.veskeli.nightrunner.SpellSystem.ModSpells;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
@@ -30,6 +32,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
+import static net.veskeli.nightrunner.SpellSystem.ModSpells.SPELL_REGISTRY;
+
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Nightrunner.MODID)
 public class Nightrunner
@@ -45,6 +49,8 @@ public class Nightrunner
     {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        // Register the registries
+        modEventBus.addListener(this::registerRegistries);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -82,7 +88,12 @@ public class Nightrunner
         // Register the attachments
         ModAttachments.register(modEventBus);
 
+        ModSpells.register(modEventBus);
         //modEventBus.addListener(ModEventSubscriber::register);
+    }
+
+    void registerRegistries(NewRegistryEvent event) {
+        event.register(SPELL_REGISTRY);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

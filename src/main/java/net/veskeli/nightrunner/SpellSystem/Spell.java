@@ -5,7 +5,11 @@ import net.veskeli.nightrunner.Nightrunner;
 
 public class Spell implements ISpell{
 
+    //private final ResourceLocation id;
     private ResourceLocation SPELL_TEXTURE = ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/item/diamond_wand.png");
+
+    public Spell() {
+    }
 
     @Override
     public String getName() {
@@ -36,4 +40,5 @@ public class Spell implements ISpell{
     public ResourceLocation getSpellTexture() {
         return SPELL_TEXTURE;
     }
+
 }
