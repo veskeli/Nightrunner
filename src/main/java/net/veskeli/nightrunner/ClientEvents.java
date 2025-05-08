@@ -8,7 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.item.custom.WandItem;
-import net.veskeli.nightrunner.skills.SkillTreeScreen;
+import net.veskeli.nightrunner.skills.SpellSelectorScreen;
 
 import static net.veskeli.nightrunner.Nightrunner.ClientModEvents.SKILL_TREE_MAPPING;
 
@@ -33,7 +33,7 @@ public class ClientEvents {
         }
         if (SKILL_TREE_MAPPING.get().consumeClick()) {
             // Draw the skill tree screen
-            mc.setScreen(new SkillTreeScreen());
+            mc.setScreen(new SpellSelectorScreen());
         }
     }
 

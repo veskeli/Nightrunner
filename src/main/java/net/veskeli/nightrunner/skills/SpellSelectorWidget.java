@@ -3,13 +3,12 @@ package net.veskeli.nightrunner.skills;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.ImageWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class SkillTreeWidget extends AbstractWidget {
+public class SpellSelectorWidget extends AbstractWidget {
 
     public final ResourceLocation texture;
     private final int width;
@@ -17,7 +16,7 @@ public class SkillTreeWidget extends AbstractWidget {
     private final int x;
     private final int y;
 
-    public SkillTreeWidget(int x, int y, int width, int height, ResourceLocation texture) {
+    public SpellSelectorWidget(int x, int y, int width, int height, ResourceLocation texture) {
         super(x, y, width, height, Component.literal("Skill Tree Widget"));
 
         this.texture = texture;
@@ -52,11 +51,15 @@ public class SkillTreeWidget extends AbstractWidget {
 
     @Override
     public void onClick(double mouseX, double mouseY, int button) {
-        onMouseClick();
+        if (onClickHandler != null) {
+            onClickHandler.onClick();
+        }
         super.onClick(mouseX, mouseY, button);
     }
 
-    public void onMouseClick() {
+    private OnClickHandler onClickHandler;
 
+    public void setOnClickHandler(OnClickHandler onClickHandler) {
+        this.onClickHandler = onClickHandler;
     }
 }
