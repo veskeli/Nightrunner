@@ -5,10 +5,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import net.veskeli.nightrunner.networking.ClientPayloadHandler;
-import net.veskeli.nightrunner.networking.ManaSyncPacket;
-import net.veskeli.nightrunner.networking.ServerPayloadHandler;
-import net.veskeli.nightrunner.networking.TogglePronePacket;
+import net.veskeli.nightrunner.networking.*;
 
 @EventBusSubscriber(modid = Nightrunner.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModEventSubscriber {
@@ -29,6 +26,13 @@ public class ModEventSubscriber {
                 TogglePronePacket.STREAM_CODEC,
                 // Handler on server main thread:
                 new DirectionalPayloadHandler<>(null, ServerPayloadHandler::onToggleProne)
+        );
+        // Register a client→server only packet | Spell selection
+        registrar.playToServer(
+                SpellSelectPacket.TYPE,
+                SpellSelectPacket.STREAM_CODEC,
+                // Handler on server main thread:
+                new DirectionalPayloadHandler<>(null, ServerPayloadHandler::onSpellSelected)
         );
     }
 }

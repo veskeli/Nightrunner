@@ -8,9 +8,11 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.SpellSystem.Spell;
+import net.veskeli.nightrunner.networking.SpellSelectPacket;
 
 public class SpellSelectorWidget extends AbstractWidget {
 
@@ -112,6 +114,10 @@ public class SpellSelectorWidget extends AbstractWidget {
             // Send data to the player
             player.setData(ModAttachments.PLAYER_SPELLS, attachment);
         }
+
+        // Send data to server
+        SpellSelectPacket packet = new SpellSelectPacket(index);
+        PacketDistributor.sendToServer(packet);
     }
 
     private OnClickHandler onClickHandler;
