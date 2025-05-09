@@ -9,7 +9,7 @@ public interface ISpell {
     String getName();
     int getCost();
     int getCooldown();
-    void castSpell(Level level, Player player, InteractionHand hand);
+    boolean castSpell(Level level, Player player, InteractionHand hand);
     void onCast();
     ResourceLocation getSpellTexture();
 }

@@ -77,11 +77,15 @@ public class WandItem extends Item{
                 return InteractionResultHolder.fail(itemStack);
             }
 
-            // Use the spell slot
-            mana.subtractSpellSlots(spellCost);
-
             // Cast the spell
-            spell.castSpell(level,player, hand);
+            boolean succeeded = spell.castSpell(level,player, hand);
+            if(succeeded)
+            {
+                DefaultHurtItem(level, player, itemStack);
+
+                // Use the spell slot
+                mana.subtractSpellSlots(spellCost);
+            }
 
             return InteractionResultHolder.success(itemStack);
         }
@@ -90,6 +94,17 @@ public class WandItem extends Item{
         if (itemStack1 != null) return itemStack1;
 
         return InteractionResultHolder.success(itemStack);
+    }
+
+    private void DefaultHurtItem(Level level, Player player, ItemStack itemStack) {
+        // Play sound effect
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.0f);
+
+        // Damage the item
+        itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+
+        // Apply use time
+        player.getCooldowns().addCooldown(this, 20);
     }
 
     protected @Nullable InteractionResultHolder<ItemStack> useWandSpell(Level level, Player player, Mana mana, ItemStack itemStack) {
@@ -106,13 +121,7 @@ public class WandItem extends Item{
             level.addFreshEntity(projectile);
 
             // Play sound effect
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.0f);
-
-            // Damage the item
-            itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
-
-            // Apply use time
-            player.getCooldowns().addCooldown(this, 20);
+            DefaultHurtItem(level, player, itemStack);
 
             // Subtract mana
             mana.subtractMana(1);

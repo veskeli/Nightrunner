@@ -18,7 +18,7 @@ public class FireballSpell extends Spell {
     }
 
     @Override
-    public void castSpell(Level level, Player player, InteractionHand hand) {
+    public boolean castSpell(Level level, Player player, InteractionHand hand) {
         super.castSpell(level, player, hand);
 
         Vec3 vec3 = player.getLookAngle();
@@ -30,6 +30,7 @@ public class FireballSpell extends Spell {
         LargeFireball fireball = new LargeFireball(level, player, vec3, 3);
         fireball.setPos(player.getX(), player.getY() + 1.0, player.getZ());
         level.addFreshEntity(fireball);
+        return true;
     }
 
     @Override

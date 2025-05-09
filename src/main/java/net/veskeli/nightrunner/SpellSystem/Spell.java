@@ -34,17 +34,8 @@ public class Spell implements ISpell{
     }
 
     @Override
-    public void castSpell(Level level, Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getItemInHand(hand);
-
-        // Play sound effect
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EVOKER_CAST_SPELL, SoundSource.PLAYERS, 0.5f, 1.0f);
-
-        // Damage the item
-        itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
-
-        // Apply use time
-        player.getCooldowns().addCooldown(itemStack.getItem(), 20);
+    public boolean castSpell(Level level, Player player, InteractionHand hand) {
+        return false;
     }
 
     @Override
