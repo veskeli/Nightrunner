@@ -58,6 +58,28 @@ public class WandItem extends Item{
         if(spell != null)
         {
             if(player.level().isClientSide()) return InteractionResultHolder.success(itemStack);
+
+            int spellCost = spell.getCost();
+            // Check if the player has enough spell slots
+            int spellAmount = mana.getSpellAmount();
+            if(spellAmount < 1) {
+                // Send message to player
+                player.sendSystemMessage(Component.literal("Sell slots depleted!"));
+                // play sound effect
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
+                return InteractionResultHolder.fail(itemStack);
+            }
+            else if(spellAmount < spellCost) {
+                // Send message to player
+                player.sendSystemMessage(Component.literal("Not enough spell slots!"));
+                // play sound effect
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
+                return InteractionResultHolder.fail(itemStack);
+            }
+
+            // Use the spell slot
+            mana.subtractSpellSlots(spellCost);
+
             // Cast the spell
             spell.castSpell(level,player, hand);
 

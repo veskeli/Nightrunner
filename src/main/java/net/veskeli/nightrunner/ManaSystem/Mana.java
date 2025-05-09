@@ -18,6 +18,10 @@ import org.jetbrains.annotations.UnknownNullability;
 @EventBusSubscriber(modid = Nightrunner.MODID)
 public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
+    // Like spell slots. (made from spells)
+    private int spellAmount = 0;
+    private int maxSpellAmount = 20; // Spell slots are like minecraft hearts. (20 = 10 visible)
+
     private int mana = 10;
     private int maxMana = 10;
     private int currentPenalty = 0;
@@ -97,6 +101,21 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
         }
         // Else return regen cooldown
         return regenCooldown;
+    }
+
+    @Override
+    public int getSpellAmount() {
+        return spellAmount;
+    }
+
+    @Override
+    public void regenSpellSlots(int amount) {
+        spellAmount = Math.min(spellAmount + amount, maxSpellAmount);
+    }
+
+    @Override
+    public void subtractSpellSlots(int amount) {
+        spellAmount = Math.max(spellAmount - amount, 0);
     }
 
     @SubscribeEvent

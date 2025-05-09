@@ -12,4 +12,9 @@ public interface IMana {
     int getCurrentPenalty();
     void subtractPenalty(int amount);
     int getCurrentRecharge();
+
+    // spell slots
+    int getSpellAmount();
+    void regenSpellSlots(int amount);
+    void subtractSpellSlots(int amount);
 }

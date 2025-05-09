@@ -24,7 +24,7 @@ public class FireballSpell extends Spell {
         Vec3 vec3 = player.getLookAngle();
 
         // Speed it up
-        vec3 = vec3.scale(8.0); // Adjust the speed multiplier as needed
+        vec3 = vec3.scale(18.0); // Adjust the speed multiplier as needed
 
         // Summon a fireball entity
         LargeFireball fireball = new LargeFireball(level, player, vec3, 3);
