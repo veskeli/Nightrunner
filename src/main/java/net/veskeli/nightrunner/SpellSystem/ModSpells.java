@@ -12,6 +12,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.SpellSystem.Spells.FireballSpell;
 import net.veskeli.nightrunner.SpellSystem.Spells.IceKnifeSpell;
+import net.veskeli.nightrunner.SpellSystem.Spells.Longstrider;
 
 import java.util.function.Supplier;
 
@@ -36,6 +37,7 @@ public class ModSpells {
 
     public static final Supplier<Spell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
     public static final Supplier<Spell> ICEKNIFE = SPELLS.register("ice_knife", IceKnifeSpell::new);
+    public static final Supplier<Spell> Longstrider = SPELLS.register("longstrider", Longstrider::new);
 
 
     public static void register(IEventBus eventBus) {
