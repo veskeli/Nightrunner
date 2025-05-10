@@ -2,7 +2,6 @@ package net.veskeli.nightrunner.entity.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -10,12 +9,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.veskeli.nightrunner.ManaSystem.EntityManaOrb;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.custom.ManaOrbEntity;
-import org.checkerframework.checker.signature.qual.Identifier;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
+import org.jetbrains.annotations.NotNull;
 
 public class ManaOrbRenderer extends EntityRenderer<ManaOrbEntity> {
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Nightrunner.MODID, "textures/entity/mana_orb.png");
@@ -26,7 +22,7 @@ public class ManaOrbRenderer extends EntityRenderer<ManaOrbEntity> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ManaOrbEntity manaOrbEntity) {
+    public @NotNull ResourceLocation getTextureLocation(@NotNull ManaOrbEntity manaOrbEntity) {
         return TEXTURE;
     }
 
