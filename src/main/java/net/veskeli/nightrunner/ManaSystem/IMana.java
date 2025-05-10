@@ -24,4 +24,6 @@ public interface IMana {
     void setMaxSpellAmount(int maxSpellAmount);
 
     void setReplicatedData(ManaSyncPacket data);
+
+    boolean areSpellSlotsFull();
 }

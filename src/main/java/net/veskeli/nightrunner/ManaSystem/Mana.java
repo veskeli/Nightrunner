@@ -153,6 +153,11 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     }
 
     @Override
+    public boolean areSpellSlotsFull() {
+        return spellAmount >= maxSpellAmount;
+    }
+
+    @Override
     public void setReplicatedData(ManaSyncPacket data) {
         mana = data.currentMana();
         maxMana = data.maxMana();
