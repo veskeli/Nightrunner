@@ -38,6 +38,11 @@ public class WandProjectile extends AbstractHurtingProjectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
 
+        // If owner is not null and the entity is the owner, return
+        if (this.owner != null && result.getEntity() == this.getOwner()) {
+            return;
+        }
+
         double d0 = this.baseDamage;
         DamageSource damagesource = this.damageSources().magic();
 
@@ -72,7 +77,7 @@ public class WandProjectile extends AbstractHurtingProjectile {
             );
 
             List<LivingEntity> targets = this.level().getEntitiesOfClass(LivingEntity.class, aoe,
-                    entity -> entity != this.getOwner() && entity.isAlive());
+                    LivingEntity::isAlive);
 
             for (LivingEntity target : targets) {
                 target.hurt(damagesource, (float) damage);

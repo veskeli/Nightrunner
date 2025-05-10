@@ -8,6 +8,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.ModEntities;
+import net.veskeli.nightrunner.entity.client.FireBallRenderer;
 import net.veskeli.nightrunner.entity.client.GraveModel;
 import net.veskeli.nightrunner.entity.client.NoopRenderer;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
@@ -27,6 +28,7 @@ public class ModEventsBusEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        EntityRenderers.register(ModEntities.WAND_PROJECTILE.get(), NoopRenderer::new);
+        EntityRenderers.register(ModEntities.WAND_PROJECTILE.get(), FireBallRenderer::new);
+        EntityRenderers.register(ModEntities.ICE_KNIFE_PROJECTILE.get(), NoopRenderer::new);
     }
 }

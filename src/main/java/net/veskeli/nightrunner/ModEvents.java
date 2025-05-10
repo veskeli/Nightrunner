@@ -102,6 +102,9 @@ public class ModEvents {
 
         // Load health stats
         HealthSystem.loadPlayerMaxHealth(player);
+
+        // Send the mana data to the client
+        Mana.replicateData(mana, (ServerPlayer) player);
     }
 
     @SubscribeEvent

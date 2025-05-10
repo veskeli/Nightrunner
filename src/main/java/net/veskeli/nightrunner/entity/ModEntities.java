@@ -8,6 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
+import net.veskeli.nightrunner.entity.projectile.IceKnifeProjectile;
 import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 import net.veskeli.nightrunner.entity.variants.ghast.MultiShotGhast;
 
@@ -30,6 +31,14 @@ public class ModEntities {
                     .clientTrackingRange(4)
                     .updateInterval(10)
                     .build("wand_projectile"));
+
+    // Ice Knife Projectile
+    public static final Supplier<EntityType<IceKnifeProjectile>> ICE_KNIFE_PROJECTILE = ENTITIES.register("ice_knife_projectile",
+            () -> EntityType.Builder.<IceKnifeProjectile>of(IceKnifeProjectile::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f) // size like a snowball
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("ice_knife_projectile"));
 
     // Multi shot ghast
     public static final Supplier<EntityType<MultiShotGhast>> MULTI_GHAST = ENTITIES.register("multi_ghast",

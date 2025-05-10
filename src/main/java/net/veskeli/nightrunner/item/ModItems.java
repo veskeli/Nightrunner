@@ -30,9 +30,9 @@ public class ModItems {
     public static final DeferredItem<Item> GoldWand = ITEMS.register("gold_wand",
             () -> new WandItem((WandItemProperties) new WandItemProperties().power(3.0f).aoeRadius(1.0f).durability(32)));
     public static final DeferredItem<Item> IronWand = ITEMS.register("iron_wand",
-            () -> new WandItem((WandItemProperties) new WandItemProperties().power(5.0f).aoeRadius(1.5f).durability(250)));
+            () -> new WandItem((WandItemProperties) new WandItemProperties().power(5.0f).aoeRadius(1.2f).durability(250)));
     public static final DeferredItem<Item> DiamondWand = ITEMS.register("diamond_wand",
-            () -> new WandItem((WandItemProperties) new WandItemProperties().power(6.0f).aoeRadius(2.0f).durability(1561)));
+            () -> new WandItem((WandItemProperties) new WandItemProperties().power(6.0f).aoeRadius(1.5f).durability(1561)));
 
     // Staffs
     public static final DeferredItem<Item> WoodenStaff = ITEMS.register("wooden_staff", () -> new StaffItem(new Item.Properties().durability(59)));

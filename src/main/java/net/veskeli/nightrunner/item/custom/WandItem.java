@@ -48,7 +48,6 @@ public class WandItem extends Item{
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
     {
-        System.out.println("Using wand item");
         ItemStack itemStack = player.getItemInHand(hand);
 
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
@@ -124,7 +123,7 @@ public class WandItem extends Item{
         itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
 
         // Apply use time
-        player.getCooldowns().addCooldown(this, 20);
+        player.getCooldowns().addCooldown(this, 15);
     }
 
     protected @Nullable boolean useWandSpell(Level level, Player player, Mana mana, ItemStack itemStack) {
@@ -138,7 +137,8 @@ public class WandItem extends Item{
         WandProjectile projectile = new WandProjectile(ModEntities.WAND_PROJECTILE.get(), level);
         projectile.setCustomProperties(player,power, aoeRadius);
         projectile.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
-        projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 3.0F); // same speed as arrow
+        projectile.setOwner(player);
+        projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 2.0F); // same speed as arrow
         level.addFreshEntity(projectile);
 
         // Play sound effect
