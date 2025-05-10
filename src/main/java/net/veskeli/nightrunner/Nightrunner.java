@@ -2,26 +2,20 @@ package net.veskeli.nightrunner;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.GhastRenderer;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.veskeli.ModCommands;
-import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.SpellSystem.ModSpells;
+import net.veskeli.nightrunner.client.ClientOnlyEvents;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
@@ -41,7 +35,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import static net.veskeli.nightrunner.SpellSystem.ModSpells.SPELL_REGISTRY;
@@ -140,7 +133,7 @@ public class Nightrunner
         public static final Lazy<KeyMapping> SKILL_TREE_MAPPING = Lazy.of(() -> new KeyMapping(
                 "key.nightrunner_difficulty.skill_tree",
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_I,
+                GLFW.GLFW_MOUSE_BUTTON_4,
                 "key.categories.nightrunner"
         ));
 
@@ -148,6 +141,15 @@ public class Nightrunner
         @SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
             event.register(SKILL_TREE_MAPPING.get());
+        }
+    }
+
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+    public static class ClientGameEvents
+    {
+        @SubscribeEvent
+        public static void onPlayerTick(PlayerTickEvent.Post event) {
+            ClientOnlyEvents.onPlayerTick(event);
         }
     }
 

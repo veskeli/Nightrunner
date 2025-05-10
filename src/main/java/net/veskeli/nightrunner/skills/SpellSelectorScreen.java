@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.common.Mod;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.SpellSystem.Spell;
