@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.veskeli.nightrunner.entity.ModEntities;
+import net.veskeli.nightrunner.entity.custom.ManaOrbEntity;
 import net.veskeli.nightrunner.item.ModItems;
 
 import java.util.Arrays;
@@ -72,17 +74,9 @@ public class ManaEvents {
                     // Generate a random amount between min and max (inclusive)
                     int amount = mobDrop.getMinAmount() + new Random().nextInt(mobDrop.getMaxAmount() - mobDrop.getMinAmount() + 1);
 
-                    for (int i = 0; i < amount; i++) {
-                        ItemStack manaOrb = new ItemStack(ModItems.ManaOrb.get());
-                        ItemEntity itemEntity = new ItemEntity(
-                                event.getEntity().level(),
-                                event.getEntity().getX(),
-                                event.getEntity().getY(),
-                                event.getEntity().getZ(),
-                                manaOrb
-                        );
-                        event.getEntity().level().addFreshEntity(itemEntity);
-                    }
+                    ManaOrbEntity manaOrb = new ManaOrbEntity(ModEntities.MANA_ORB.get(), event.getEntity().level(), amount);
+                    manaOrb.setPos(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
+                    event.getEntity().level().addFreshEntity(manaOrb);
                 });
     }
 }

@@ -45,6 +45,6 @@ public class FireballSpell extends Spell {
 
     @Override
     public int getCost() {
-        return 5;
+        return 3;
     }
 }

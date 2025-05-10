@@ -14,10 +14,12 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.veskeli.ModCommands;
+import net.veskeli.nightrunner.ManaSystem.ManaEvents;
 import net.veskeli.nightrunner.SpellSystem.ModSpells;
 import net.veskeli.nightrunner.client.ClientOnlyEvents;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
+import net.veskeli.nightrunner.entity.client.ManaOrbRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
 import org.lwjgl.glfw.GLFW;
@@ -63,6 +65,7 @@ public class Nightrunner
         NeoForge.EVENT_BUS.register(this);
 
         NeoForge.EVENT_BUS.register(new ModEvents());
+        NeoForge.EVENT_BUS.register(new ManaEvents());
 
         NeoForge.EVENT_BUS.register(new ClientEvents());
 
@@ -127,6 +130,8 @@ public class Nightrunner
             EntityRenderers.register(ModEntities.GRAVE.get(), GraveRenderer::new);
 
             EntityRenderers.register(ModEntities.MULTI_GHAST.get(), GhastRenderer::new);
+
+            EntityRenderers.register(ModEntities.MANA_ORB.get(), ManaOrbRenderer::new);
         }
 
         // Key mapping for skill tree

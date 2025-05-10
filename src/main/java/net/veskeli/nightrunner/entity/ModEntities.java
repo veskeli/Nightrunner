@@ -8,6 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.veskeli.nightrunner.Nightrunner;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
+import net.veskeli.nightrunner.entity.custom.ManaOrbEntity;
 import net.veskeli.nightrunner.entity.projectile.IceKnifeProjectile;
 import net.veskeli.nightrunner.entity.projectile.WandProjectile;
 import net.veskeli.nightrunner.entity.variants.ghast.MultiShotGhast;
@@ -45,6 +46,14 @@ public class ModEntities {
             () -> EntityType.Builder.of(MultiShotGhast::new, MobCategory.MONSTER)
                     .sized(4.0F, 4.0F) // same as vanilla ghast
                     .build(Nightrunner.MODID + ":multi_ghast"));
+
+    // Mana orb
+    public static final Supplier<EntityType<ManaOrbEntity>> MANA_ORB = ENTITIES.register("mana_orb",
+            () -> EntityType.Builder.<ManaOrbEntity>of(ManaOrbEntity::new, MobCategory.MISC)
+                    .sized(1.0f, 1.0f)
+                    .clientTrackingRange(4)
+                    .updateInterval(10)
+                    .build("mana_orb"));
 
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
