@@ -144,7 +144,7 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     }
 
     public ManaSyncPacket getNewManaSyncPacket() {
-        return new ManaSyncPacket(mana, maxMana, currentPenalty, spellAmount, maxSpellAmount);
+        return new ManaSyncPacket(mana, maxMana, getCurrentRecharge(), spellAmount, maxSpellAmount);
     }
 
     public static void replicateData(Mana mana, ServerPlayer player) {
@@ -156,7 +156,7 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     public void setReplicatedData(ManaSyncPacket data) {
         mana = data.currentMana();
         maxMana = data.maxMana();
-        currentPenalty = data.currentRecharge();
+        regenCooldown = data.currentRecharge();
         spellAmount = data.spellSlots();
         maxSpellAmount = data.maxSpellSlots();
     }
@@ -166,11 +166,6 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
         Player player = event.getEntity();
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
 
-        // Return if mana is full
-        if (mana.getMana() >= mana.getMaxMana()) {
-            return;
-        }
-
         if (event.getEntity().level().isClientSide)
         {
             // In the client we can tick down the cooldown.
@@ -179,6 +174,11 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
             // on the client side.
             mana.setRegenCooldown(mana.getRegenCooldown() - 1);
             player.setData(ModAttachments.PLAYER_MANA, mana);
+            return;
+        }
+
+        // Return if mana is full
+        if (mana.getMana() >= mana.getMaxMana()) {
             return;
         }
 
@@ -206,13 +206,8 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
             player.setData(ModAttachments.PLAYER_MANA, mana);
 
             if (player instanceof ServerPlayer serverPlayer) {
-                // Send mana to client
-                ManaSyncPacket pkt = mana.getNewManaSyncPacket();
-                PacketDistributor.sendToPlayer(serverPlayer, pkt);
-            }
-            else {
-                // Handle the case where player is not a ServerPlayer
-                System.out.println("Player is not a ServerPlayer");
+                // Send data to the client
+                replicateData(mana, serverPlayer);
             }
         }
     }

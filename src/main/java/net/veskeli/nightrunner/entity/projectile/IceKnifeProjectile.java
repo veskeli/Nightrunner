@@ -64,8 +64,8 @@ public class IceKnifeProjectile extends AbstractHurtingProjectile {
 
         // TODO: Make custom effect for frozen entities
         // Apply wither and slow effect
-        livingEntity.forceAddEffect(new MobEffectInstance(MobEffects.WITHER, 100, 1), livingEntity); // Wither effect for 5 seconds
-        livingEntity.forceAddEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2), livingEntity); // Slowness effect for 5 seconds
+        livingEntity.forceAddEffect(new MobEffectInstance(MobEffects.WITHER, 100, 0), livingEntity); // Wither effect for 5 seconds
+        livingEntity.forceAddEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 2), livingEntity); // Slowness effect for 5 seconds
 
         livingEntity.setLastHurtByMob(this.owner);
         livingEntity.setLastHurtMob(this.owner);

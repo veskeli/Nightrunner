@@ -72,7 +72,7 @@ public class ClientEvents {
 
             spellAttachment.setSpell(0, ModSpells.FIREBALL.get());
             spellAttachment.setSpell(1, ModSpells.ICEKNIFE.get());
-            spellAttachment.setSpell(6, ModSpells.Longstrider.get());
+            spellAttachment.setSpell(5, ModSpells.Longstrider.get());
 
             event.getEntity().setData(ModAttachments.PLAYER_SPELLS, spellAttachment);
 

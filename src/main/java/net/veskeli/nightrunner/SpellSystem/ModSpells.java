@@ -34,7 +34,6 @@ public class ModSpells {
     public static final DeferredRegister<Spell> SPELLS = DeferredRegister.create(SPELL_REGISTRY, Nightrunner.MODID);
 
     // Register the spells
-
     public static final Supplier<Spell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
     public static final Supplier<Spell> ICEKNIFE = SPELLS.register("ice_knife", IceKnifeSpell::new);
     public static final Supplier<Spell> Longstrider = SPELLS.register("longstrider", Longstrider::new);

@@ -42,4 +42,9 @@ public class FireballSpell extends Spell {
     public ResourceLocation getSpellTexture() {
         return SPELL_TEXTURE;
     }
+
+    @Override
+    public int getCost() {
+        return 5;
+    }
 }

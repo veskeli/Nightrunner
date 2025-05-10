@@ -52,7 +52,7 @@ public class SpellSelectorScreen extends Screen {
         addRenderableWidget(centerSkillWidget);
 
         // Calculate radius
-        double radius = widgetSize * 1.5; // Adjust the radius as needed
+        double radius = widgetSize * 2; // Adjust the radius as needed
 
         // Add 6 surrounding skills in a circle
         for (int i = 0; i < 6; i++) {

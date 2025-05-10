@@ -13,6 +13,11 @@ import net.veskeli.nightrunner.SpellSystem.Spell;
 import java.util.List;
 
 public class Longstrider extends Spell {
+
+    public Longstrider() {
+        super();
+    }
+
     @Override
     public String getName() {
         return "Longstrider";
@@ -41,7 +46,7 @@ public class Longstrider extends Spell {
 
         for (Player target : playersInArea) {
             // Apply the Longstrider effect to each player in the area
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 1));
+            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 600, 1));
         }
 
         return true;
