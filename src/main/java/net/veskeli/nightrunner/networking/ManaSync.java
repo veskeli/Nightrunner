@@ -8,7 +8,7 @@ import net.veskeli.nightrunner.ModAttachments;
 public class ManaSync {
     public static void syncManaToClient(ServerPlayer player) {
         Mana m = player.getData(ModAttachments.PLAYER_MANA);
-        ManaSyncPacket pkt = new ManaSyncPacket(m.getMana(), m.getMaxMana(), m.getRegenCooldown());
+        ManaSyncPacket pkt = m.getNewManaSyncPacket();
         PacketDistributor.sendToPlayer(player, pkt);
     }
 }

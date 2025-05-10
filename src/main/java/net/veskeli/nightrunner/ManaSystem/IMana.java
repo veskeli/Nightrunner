@@ -17,4 +17,6 @@ public interface IMana {
     int getSpellAmount();
     void regenSpellSlots(int amount);
     void subtractSpellSlots(int amount);
+    void setSpellLevel(int level);
+    int getMaxSpellAmount();
 }

@@ -1,14 +1,25 @@
 package net.veskeli.nightrunner;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.GhastRenderer;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.SpellSystem.ModSpells;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.client.GraveRenderer;
@@ -79,9 +90,6 @@ public class Nightrunner
         // Register the mod menu types
         ModMenuTypes.register(modEventBus);
 
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
-
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
@@ -96,13 +104,31 @@ public class Nightrunner
         event.register(SPELL_REGISTRY);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
+    @SubscribeEvent
+    void onRegisterCommands(RegisterCommandsEvent event) {
+        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 
+        // Set spell level
+        dispatcher.register(net.minecraft.commands.Commands.literal("SetSpellLevel")
+                    .then(Commands.argument("Player", EntityArgument.player())
+                    .then(Commands.argument("Amount", IntegerArgumentType.integer(0, 100))
+                    .requires(source -> source.hasPermission(2)) // Permission level (2 = OP)
+                    .executes(context -> {
+                        Player player = EntityArgument.getPlayer(context, "Player");
+                        int amount = IntegerArgumentType.getInteger(context, "Amount");
+
+                        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+                        mana.setSpellLevel(amount);
+
+                        player.setData(ModAttachments.PLAYER_MANA, mana);
+
+                        System.out.println("Is Server: " + context.getSource().getLevel().isClientSide());
+
+                        return 1; // Return a success code
+                    }))));
     }
 
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
+    private void commonSetup(final FMLCommonSetupEvent event)
     {
 
     }

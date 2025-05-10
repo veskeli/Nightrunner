@@ -75,12 +75,23 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("Mana", mana);
+        tag.putInt("MaxMana", maxMana);
+        tag.putInt("SpellAmount", spellAmount);
+        tag.putInt("MaxSpellAmount", maxSpellAmount);
         return tag;
     }
 
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag compoundTag) {
         mana = compoundTag.getInt("Mana");
+        maxMana = compoundTag.getInt("MaxMana");
+        spellAmount = compoundTag.getInt("SpellAmount");
+        maxSpellAmount = compoundTag.getInt("MaxSpellAmount");
+    }
+
+    @Override
+    public void setSpellLevel(int level) {
+        this.spellAmount = Math.min(level, maxSpellAmount);
     }
 
     @Override
@@ -116,6 +127,15 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     @Override
     public void subtractSpellSlots(int amount) {
         spellAmount = Math.max(spellAmount - amount, 0);
+    }
+
+    @Override
+    public int getMaxSpellAmount() {
+        return maxSpellAmount;
+    }
+
+    public ManaSyncPacket getNewManaSyncPacket() {
+        return new ManaSyncPacket(mana, maxMana, currentPenalty, spellAmount, maxSpellAmount);
     }
 
     @SubscribeEvent
@@ -164,7 +184,7 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
             if (player instanceof ServerPlayer serverPlayer) {
                 // Send mana to client
-                ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana(), mana.getCurrentRecharge());
+                ManaSyncPacket pkt = mana.getNewManaSyncPacket();
                 PacketDistributor.sendToPlayer(serverPlayer, pkt);
             }
             else {

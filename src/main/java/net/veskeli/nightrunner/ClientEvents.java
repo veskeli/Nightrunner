@@ -62,9 +62,24 @@ public class ClientEvents {
         // Check if the player is holding a specific item
         if (event.getEntity().getMainHandItem().getItem() instanceof WandItem)
         {
-            // Get the mana data from the player
             Mana mana = event.getEntity().getData(ModAttachments.PLAYER_MANA);
-            MutableComponent manaText = Component.literal("Mana: ").withStyle(style -> style.withColor(ChatFormatting.AQUA).withBold(true))
+            MutableComponent manaText;
+            // Spell level
+            manaText = Component.literal("Spell Level: ")
+                    .withStyle(style -> style.withColor(ChatFormatting.AQUA).withBold(true))
+                    .append(Component.literal(String.valueOf(mana.getSpellAmount()))
+                            .withStyle(style -> style.withColor(ChatFormatting.DARK_PURPLE).withBold(true)))
+                    .append(Component.literal(" / ")
+                            .withStyle(style -> style.withColor(ChatFormatting.GRAY)))
+                    .append(Component.literal(String.valueOf(mana.getMaxSpellAmount()))
+                            .withStyle(style -> style.withColor(ChatFormatting.GREEN).withBold(true)));
+
+            // Separator
+            manaText.append(Component.literal(" | ")
+                    .withStyle(style -> style.withColor(ChatFormatting.WHITE)));
+
+            // Get the mana data from the player
+            manaText.append(Component.literal("Mana: ").withStyle(style -> style.withColor(ChatFormatting.AQUA).withBold(true)))
                     .append(Component.literal(String.valueOf(mana.getMana()))
                             .withStyle(style -> style.withColor(ChatFormatting.BLUE).withBold(true)))
                     .append(Component.literal(" / ")

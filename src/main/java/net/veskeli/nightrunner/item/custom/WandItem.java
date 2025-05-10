@@ -60,6 +60,7 @@ public class WandItem extends Item{
             if(player.level().isClientSide()) return InteractionResultHolder.success(itemStack);
 
             int spellCost = spell.getCost();
+
             // Check if the player has enough spell slots
             int spellAmount = mana.getSpellAmount();
             if(spellAmount < 1) {
@@ -85,6 +86,9 @@ public class WandItem extends Item{
 
                 // Use the spell slot
                 mana.subtractSpellSlots(spellCost);
+
+                // set mana back to player
+                player.setData(ModAttachments.PLAYER_MANA, mana);
             }
 
             return InteractionResultHolder.success(itemStack);
@@ -130,7 +134,7 @@ public class WandItem extends Item{
 
             ServerPlayer serverPlayer = (ServerPlayer) player;
             // Send mana to client
-            ManaSyncPacket pkt = new ManaSyncPacket(mana.getMana(), mana.getMaxMana(), mana.getCurrentRecharge());
+            ManaSyncPacket pkt = mana.getNewManaSyncPacket();
             PacketDistributor.sendToPlayer(serverPlayer, pkt);
         }
         else
