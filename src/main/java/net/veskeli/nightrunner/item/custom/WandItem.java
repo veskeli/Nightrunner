@@ -48,6 +48,7 @@ public class WandItem extends Item{
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
     {
+        System.out.println("Using wand item");
         ItemStack itemStack = player.getItemInHand(hand);
 
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
@@ -93,10 +94,20 @@ public class WandItem extends Item{
 
             return InteractionResultHolder.success(itemStack);
         }
-        // If spell was not selected we use the wand spell
-        InteractionResultHolder<ItemStack> itemStack1 = useWandSpell(level, player, mana, itemStack);
-        if (itemStack1 != null) return itemStack1;
 
+        // Return if client side
+        if (level.isClientSide) {
+            return InteractionResultHolder.success(itemStack);
+        }
+        // If spell was not selected we use the wand spell
+        if (useWandSpell(level, player, mana, itemStack))
+        {
+            return InteractionResultHolder.success(itemStack);
+        }
+        // play sound effect
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
+        // Send message to player
+        System.out.println("Mana is empty!");
         return InteractionResultHolder.success(itemStack);
     }
 
@@ -111,41 +122,33 @@ public class WandItem extends Item{
         player.getCooldowns().addCooldown(this, 20);
     }
 
-    protected @Nullable InteractionResultHolder<ItemStack> useWandSpell(Level level, Player player, Mana mana, ItemStack itemStack) {
-        if (!level.isClientSide()) {
-            if(mana.getMana() < 1) {
-                return InteractionResultHolder.fail(itemStack);
-            }
-
-            // Summon the WandProjectile
-            WandProjectile projectile = new WandProjectile(ModEntities.WAND_PROJECTILE.get(), level);
-            projectile.setCustomProperties(player,power, aoeRadius);
-            projectile.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
-            projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 3.0F); // same speed as arrow
-            level.addFreshEntity(projectile);
-
-            // Play sound effect
-            DefaultHurtItem(level, player, itemStack);
-
-            // Subtract mana
-            mana.subtractMana(1);
-            // set mana back to player
-            player.setData(ModAttachments.PLAYER_MANA, mana);
-
-            ServerPlayer serverPlayer = (ServerPlayer) player;
-            // Send mana to client
-            ManaSyncPacket pkt = mana.getNewManaSyncPacket();
-            PacketDistributor.sendToPlayer(serverPlayer, pkt);
+    protected @Nullable boolean useWandSpell(Level level, Player player, Mana mana, ItemStack itemStack) {
+        if(mana.getMana() < 1) {
+            // Send message to player
+            player.sendSystemMessage(Component.literal("Mana is empty!"));
+            return false;
         }
-        else
-        {
-            if(mana.getMana() < 1) {
-                // Send message to player
-                player.sendSystemMessage(Component.literal("Mana is empty!"));
-                // play sound effect
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_DRIP, SoundSource.PLAYERS, 0.5f, 1.0f);
-            }
-        }
-        return null;
+
+        // Summon the WandProjectile
+        WandProjectile projectile = new WandProjectile(ModEntities.WAND_PROJECTILE.get(), level);
+        projectile.setCustomProperties(player,power, aoeRadius);
+        projectile.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
+        projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 3.0F); // same speed as arrow
+        level.addFreshEntity(projectile);
+
+        // Play sound effect
+        DefaultHurtItem(level, player, itemStack);
+
+        // Subtract mana
+        mana.subtractMana(1);
+        // set mana back to player
+        player.setData(ModAttachments.PLAYER_MANA, mana);
+
+        ServerPlayer serverPlayer = (ServerPlayer) player;
+        // Send mana to client
+        ManaSyncPacket pkt = mana.getNewManaSyncPacket();
+        PacketDistributor.sendToPlayer(serverPlayer, pkt);
+        return true;
+
     }
 }

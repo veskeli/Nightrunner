@@ -5,6 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.veskeli.nightrunner.ManaSystem.Mana;
@@ -12,6 +14,7 @@ import net.veskeli.nightrunner.SpellSystem.Attachment.SpellAttachment;
 import net.veskeli.nightrunner.SpellSystem.ModSpells;
 import net.veskeli.nightrunner.SpellSystem.Spell;
 import net.veskeli.nightrunner.SpellSystem.Spells.FireballSpell;
+import net.veskeli.nightrunner.item.ModItems;
 import net.veskeli.nightrunner.item.custom.WandItem;
 import net.veskeli.nightrunner.skills.SpellSelectorScreen;
 
@@ -21,6 +24,28 @@ public class ClientEvents {
 
     @SubscribeEvent
     public void onPlayerTick(PlayerTickEvent.Post event) {
+        // Convert mana orbs to spell levels
+        if(!event.getEntity().level().isClientSide())
+        {
+            ServerPlayer player = (ServerPlayer) event.getEntity();
+            // Check if player inventory contains mana orbs
+            if (player.getInventory().contains(ModItems.ManaOrb.get().getDefaultInstance())) {
+                // Get the mana data from the player
+                Mana mana = player.getData(ModAttachments.PLAYER_MANA);
+                // Get the amount of mana orbs in the inventory
+                int manaOrbs = player.getInventory().countItem(ModItems.ManaOrb.get());
+                System.out.println("Mana orbs: " + manaOrbs);
+                // Convert them to spell levels
+                mana.regenSpellSlots(manaOrbs);
+                // Get the index of the mana orbs in the inventory
+                int manaOrbIndex = player.getInventory().findSlotMatchingItem(ModItems.ManaOrb.get().getDefaultInstance());
+                // Remove the mana orbs from the inventory
+                player.getInventory().removeItem(manaOrbIndex, manaOrbs);
+                // Set the mana data to the player
+                player.setData(ModAttachments.PLAYER_MANA, mana);
+            }
+        }
+
         ShowManaWhenHoldingCorrectItem(event);
 
         CheckForOpenSkillTreeKeybind(event);

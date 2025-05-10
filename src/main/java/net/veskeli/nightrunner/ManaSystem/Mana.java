@@ -18,8 +18,11 @@ import org.jetbrains.annotations.UnknownNullability;
 @EventBusSubscriber(modid = Nightrunner.MODID)
 public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
+    public static final int MAX_MANA = 20; // Max mana
+    public static final int MAX_SPELL_AMOUNT = 10; // Max spell slots
+
     // Like spell slots. (made from spells)
-    private int spellAmount = 0;
+    private int spellAmount = 20;
     private int maxSpellAmount = 20; // Spell slots are like minecraft hearts. (20 = 10 visible)
 
     private int mana = 10;
@@ -132,6 +135,11 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     @Override
     public int getMaxSpellAmount() {
         return maxSpellAmount;
+    }
+
+    @Override
+    public void setMaxSpellAmount(int maxSpellAmount) {
+        this.maxSpellAmount = Math.max(maxSpellAmount, 0);
     }
 
     public ManaSyncPacket getNewManaSyncPacket() {

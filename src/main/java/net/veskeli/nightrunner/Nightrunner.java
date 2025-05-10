@@ -19,6 +19,7 @@ import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.veskeli.ModCommands;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.SpellSystem.ModSpells;
 import net.veskeli.nightrunner.entity.ModEntities;
@@ -107,25 +108,7 @@ public class Nightrunner
     @SubscribeEvent
     void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-
-        // Set spell level
-        dispatcher.register(net.minecraft.commands.Commands.literal("SetSpellLevel")
-                    .then(Commands.argument("Player", EntityArgument.player())
-                    .then(Commands.argument("Amount", IntegerArgumentType.integer(0, 100))
-                    .requires(source -> source.hasPermission(2)) // Permission level (2 = OP)
-                    .executes(context -> {
-                        Player player = EntityArgument.getPlayer(context, "Player");
-                        int amount = IntegerArgumentType.getInteger(context, "Amount");
-
-                        Mana mana = player.getData(ModAttachments.PLAYER_MANA);
-                        mana.setSpellLevel(amount);
-
-                        player.setData(ModAttachments.PLAYER_MANA, mana);
-
-                        System.out.println("Is Server: " + context.getSource().getLevel().isClientSide());
-
-                        return 1; // Return a success code
-                    }))));
+        ModCommands.register(dispatcher);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
