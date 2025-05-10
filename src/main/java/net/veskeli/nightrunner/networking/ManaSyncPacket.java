@@ -18,11 +18,11 @@ public record ManaSyncPacket(int currentMana, int maxMana, int currentRecharge, 
             ByteBufCodecs.VAR_INT,
             ManaSyncPacket::maxMana,
             ByteBufCodecs.VAR_INT,
+            ManaSyncPacket::currentRecharge,
+            ByteBufCodecs.VAR_INT,
             ManaSyncPacket::spellSlots,
             ByteBufCodecs.VAR_INT,
             ManaSyncPacket::maxSpellSlots,
-            ByteBufCodecs.VAR_INT,
-            ManaSyncPacket::currentRecharge,
             ManaSyncPacket::new
     );
 

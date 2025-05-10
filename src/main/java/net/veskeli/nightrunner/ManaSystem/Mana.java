@@ -22,8 +22,8 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
     public static final int MAX_SPELL_AMOUNT = 10; // Max spell slots
 
     // Like spell slots. (made from spells)
-    private int spellAmount = 20;
-    private int maxSpellAmount = 20; // Spell slots are like minecraft hearts. (20 = 10 visible)
+    private int spellAmount = 10;
+    private int maxSpellAmount = 10; // Spell slots are like minecraft hearts. (20 = 10 visible)
 
     private int mana = 10;
     private int maxMana = 10;
@@ -129,7 +129,8 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
     @Override
     public void subtractSpellSlots(int amount) {
-        spellAmount = Math.max(spellAmount - amount, 0);
+        int newSpellAmount = spellAmount - amount;
+        spellAmount = Math.max(newSpellAmount, 0);
     }
 
     @Override
@@ -144,6 +145,20 @@ public class Mana implements IMana, INBTSerializable<CompoundTag> {
 
     public ManaSyncPacket getNewManaSyncPacket() {
         return new ManaSyncPacket(mana, maxMana, currentPenalty, spellAmount, maxSpellAmount);
+    }
+
+    public static void replicateData(Mana mana, ServerPlayer player) {
+        ManaSyncPacket pkt = mana.getNewManaSyncPacket();
+        PacketDistributor.sendToPlayer(player, pkt);
+    }
+
+    @Override
+    public void setReplicatedData(ManaSyncPacket data) {
+        mana = data.currentMana();
+        maxMana = data.maxMana();
+        currentPenalty = data.currentRecharge();
+        spellAmount = data.spellSlots();
+        maxSpellAmount = data.maxSpellSlots();
     }
 
     @SubscribeEvent

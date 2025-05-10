@@ -1,5 +1,7 @@
 package net.veskeli.nightrunner.ManaSystem;
 
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
+
 public interface IMana {
     int getMana();
     void setMana(int mana);
@@ -20,4 +22,6 @@ public interface IMana {
     void setSpellLevel(int level);
     int getMaxSpellAmount();
     void setMaxSpellAmount(int maxSpellAmount);
+
+    void setReplicatedData(ManaSyncPacket data);
 }

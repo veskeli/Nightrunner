@@ -25,12 +25,12 @@ public class Spell implements ISpell{
 
     @Override
     public int getCost() {
-        return 0;
+        return 1;
     }
 
     @Override
     public int getCooldown() {
-        return 0;
+        return 15;
     }
 
     @Override

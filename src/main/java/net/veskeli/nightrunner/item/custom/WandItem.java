@@ -90,6 +90,11 @@ public class WandItem extends Item{
 
                 // set mana back to player
                 player.setData(ModAttachments.PLAYER_MANA, mana);
+
+                ServerPlayer serverPlayer = (ServerPlayer) player;
+                // Send mana to client
+                ManaSyncPacket pkt = mana.getNewManaSyncPacket();
+                PacketDistributor.sendToPlayer(serverPlayer, pkt);
             }
 
             return InteractionResultHolder.success(itemStack);

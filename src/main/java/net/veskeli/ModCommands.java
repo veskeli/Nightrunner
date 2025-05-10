@@ -5,9 +5,12 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.ModAttachments;
+import net.veskeli.nightrunner.networking.ManaSyncPacket;
 
 public class ModCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -35,7 +38,12 @@ public class ModCommands {
                 .then(Commands.argument("Player", EntityArgument.player())
                         .requires(source -> source.hasPermission(2)) // Permission level (2 = OP)
                         .executes(context -> {
-                            Player player = EntityArgument.getPlayer(context, "Player");
+
+                            if(context.getSource().getLevel().isClientSide) {
+                                return 0; // Return a failure code
+                            }
+
+                            ServerPlayer player = EntityArgument.getPlayer(context, "Player");
 
                             Mana mana = player.getData(ModAttachments.PLAYER_MANA);
 
@@ -47,7 +55,9 @@ public class ModCommands {
 
                             player.setData(ModAttachments.PLAYER_MANA, mana);
 
-                            System.out.println("Is Server: " + context.getSource().getLevel().isClientSide());
+                            // Send mana to client
+                            ManaSyncPacket pkt = mana.getNewManaSyncPacket();
+                            PacketDistributor.sendToPlayer(player, pkt);
 
                             return 1; // Return a success code
                         })));

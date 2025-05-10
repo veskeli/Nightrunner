@@ -16,9 +16,7 @@ public class ClientPayloadHandler {
         // Get the mana data from the player
         Mana mana = player.getData(ModAttachments.PLAYER_MANA);
         // Update the mana data
-        mana.setMana(data.currentMana());
-        mana.setMaxMana(data.maxMana());
-        mana.setRegenCooldown(data.currentRecharge());
+        mana.setReplicatedData(data);
 
         // Update the player data
         player.setData(ModAttachments.PLAYER_MANA, mana);

@@ -43,6 +43,9 @@ public class ClientEvents {
                 player.getInventory().removeItem(manaOrbIndex, manaOrbs);
                 // Set the mana data to the player
                 player.setData(ModAttachments.PLAYER_MANA, mana);
+
+                // Send the mana data to the client
+                Mana.replicateData(mana, player);
             }
         }
 
