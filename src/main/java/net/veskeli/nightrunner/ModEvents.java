@@ -60,32 +60,6 @@ import java.util.*;
 
 public class ModEvents {
 
-    // Create a list of hostile mobs
-    private static final List<EntityType<?>> HOSTILE_MOBS = Arrays.asList(
-            EntityType.ZOMBIE,
-            EntityType.SKELETON,
-            EntityType.CREEPER,
-            EntityType.SPIDER,
-            EntityType.ENDERMAN,
-            EntityType.WITCH
-    );
-
-    // Check if an entity matches the list
-    public boolean isHostileMob(Entity entity) {
-        return HOSTILE_MOBS.contains(entity.getType());
-    }
-
-    @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        // Check if the entity is hostile
-        if (isHostileMob(event.getEntity())) {
-            // Drop mana orb
-            ItemStack manaOrb = new ItemStack(ModItems.ManaOrb.get());
-            ItemEntity itemEntity = new ItemEntity(event.getEntity().level(), event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ(), manaOrb);
-            event.getEntity().level().addFreshEntity(itemEntity);
-        }
-    }
-
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
         Player newPlayer = event.getEntity();
