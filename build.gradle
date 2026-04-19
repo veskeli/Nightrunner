@@ -48,6 +48,10 @@ neoForge {
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+
+            // Give the client enough heap to avoid native crashes
+            jvmArgument '-Xmx10G'
+            jvmArgument '-Xms3G'
         }
 
         server {
