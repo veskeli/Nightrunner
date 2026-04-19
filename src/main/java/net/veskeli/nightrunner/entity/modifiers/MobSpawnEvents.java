@@ -53,7 +53,7 @@ public class MobSpawnEvents {
             }
             mob.addTag(NIGHTRUNNER_PRESET_PREFIX + preset.id());
             // For testing add preset name as mob name
-            mob.setCustomNameVisible(true);
+            // mob.setCustomNameVisible(true);
             mob.setCustomName(Component.nullToEmpty(preset.id()));
         });
 

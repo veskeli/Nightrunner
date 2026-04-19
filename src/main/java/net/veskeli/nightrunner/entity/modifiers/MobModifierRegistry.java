@@ -40,7 +40,7 @@ public class MobModifierRegistry {
                 )
                 // tanky but weaker
                 .preset("tanky", 30,
-                        multiplyMaxHealth(7),
+                        multiplyMaxHealth(1.3),
                         setDamage(8),
                         setSpeed(0.29)
                 )
