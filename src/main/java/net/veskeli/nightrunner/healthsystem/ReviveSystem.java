@@ -8,12 +8,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.item.ModItems;
 
@@ -68,23 +66,35 @@ public class ReviveSystem {
 
     // Enum to handle different item types for revival
     public enum RevivalItem {
-        SOULSTONE {
+        SOULSTONE(12.0f, 2.0f) {
             @Override
             public void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand) {
                 // Restore inventory and set player stats
                 restoreInventory(ownerPlayer, grave);
-                restoreStats(ownerPlayer, 16.0f); // Restore health with 8 hearts (16 health)
+                restoreStats(ownerPlayer, getMaxReviveHealth(), getDegradePerDeath());
                 handleReviveConvert(ownerPlayer, grave);
-
-                // Consume 1 of the item
                 itemInHand.shrink(1);
             }
         };
 
-        // Abstract method for each revival item to implement specific behavior
+        private final float maxReviveHealth;
+        private final float degradePerDeath;
+
+        RevivalItem(float maxReviveHealth, float degradePerDeath) {
+            this.maxReviveHealth = maxReviveHealth;
+            this.degradePerDeath = degradePerDeath;
+        }
+
+        public float getMaxReviveHealth() {
+            return maxReviveHealth;
+        }
+
+        public float getDegradePerDeath() {
+            return degradePerDeath;
+        }
+
         public abstract void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand);
 
-        // Helper method to restore inventory
         private static void restoreInventory(ServerPlayer ownerPlayer, GraveEntity grave) {
             List<ItemStack> stored = GraveDataStore.retrieveInventory(grave.getOwner());
             if (stored != null) {
@@ -95,34 +105,24 @@ public class ReviveSystem {
             }
         }
 
-        // Helper method to set the player's health and max health
-        private static void restoreStats(ServerPlayer player, float healthValue) {
-
-            // Set the player's max health stats
-            HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
-            healthStats.setMaxHealth((int)healthValue);
-            player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
-
-            // Set the player's health
-            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(healthValue);
-            player.setHealth(healthValue);
+        private static void restoreStats(ServerPlayer player, float itemMaxReviveHealth, float itemDegradePerDeath) {
+            float reviveHealth = HealthSystem.getReviveHealthForItem(player, itemMaxReviveHealth, itemDegradePerDeath);
+            HealthSystem.setPlayerMaxHealth(player, reviveHealth);
+            // Store the degraded value for the next revive attempt, not for the current one.
+            HealthSystem.applyReviveDegradationAfterRevive(player);
         }
 
-        // Helper method to set the player's game mode
         private static void handleReviveConvert(ServerPlayer player, GraveEntity grave) {
             player.setGameMode(GameType.SURVIVAL);
-            // Set the player's position to the grave location
             player.teleportTo(grave.getX(), grave.getY() + 1, grave.getZ());
-            // Remove the grave entity
             grave.remove(Entity.RemovalReason.DISCARDED);
         }
 
-        // Helper method to find the correct RevivalItem by checking the item in hand
         public static RevivalItem fromItem(ItemStack itemStack) {
             if (itemStack.is(ModItems.Soulstone)) {
                 return SOULSTONE;
             }
-            return null;  // No revival item found
+            return null;
         }
     }
 }

@@ -8,4 +8,16 @@ public interface IHealthStats {
     void addMaxHealth(int amount);
 
     void subtractMaxHealth(int amount);
+
+    float getCurrentReviveHealth();
+
+    void setCurrentReviveHealth(float health);
+
+    float getReviveItemMaxHealth();
+
+    void setReviveItemMaxHealth(float health);
+
+    float getReviveHealthDegradeStep();
+
+    void setReviveHealthDegradeStep(float step);
 }

@@ -49,7 +49,8 @@ public class ModItems {
                 public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
                     tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip1").withStyle(ChatFormatting.GRAY));
                     tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip2").withStyle(ChatFormatting.GREEN));
-                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip3").withStyle(ChatFormatting.GRAY));
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip3").withStyle(ChatFormatting.RED));
+                    tooltipComponents.add(Component.translatable("tooltip.nightrunner_difficulty.soulstone.tooltip4").withStyle(ChatFormatting.GRAY));
                     super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
                 }
             });

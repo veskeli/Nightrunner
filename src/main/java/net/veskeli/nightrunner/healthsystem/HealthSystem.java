@@ -1,24 +1,20 @@
 package net.veskeli.nightrunner.healthsystem;
 
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameType;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.veskeli.nightrunner.ModAttachments;
-import net.veskeli.nightrunner.entity.custom.GraveEntity;
-import net.veskeli.nightrunner.item.ModItems;
 
-import java.util.List;
 import java.util.Objects;
 
 public class HealthSystem {
+
+    private static final float MINIMUM_REVIVE_HEALTH = 2.0f;
 
     public static void addTemporaryHealth(Player player, float tempHealthAmount, float MaxAbsorptionValue) {
         // get the current absorption amount
@@ -76,6 +72,78 @@ public class HealthSystem {
         player.setHealth(healthValue);
     }
 
+    public static float getReviveHealthForItem(Player player, float itemMaxReviveHealth, float itemDegradeStep) {
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        float normalizedMaxReviveHealth = normalizeToWholeHearts(itemMaxReviveHealth);
+        float normalizedDegradeStep = normalizeDegradeStep(itemDegradeStep);
+
+        boolean needsItemRefresh = !nearlyEqual(healthStats.getReviveItemMaxHealth(), normalizedMaxReviveHealth)
+                || !nearlyEqual(healthStats.getReviveHealthDegradeStep(), normalizedDegradeStep)
+                || healthStats.getCurrentReviveHealth() <= 0.0f;
+
+        if (needsItemRefresh) {
+            healthStats.setReviveItemMaxHealth(normalizedMaxReviveHealth);
+            healthStats.setReviveHealthDegradeStep(normalizedDegradeStep);
+            healthStats.setCurrentReviveHealth(normalizedMaxReviveHealth);
+            player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+        }
+
+        float clampedReviveHealth = Math.clamp(healthStats.getCurrentReviveHealth(), MINIMUM_REVIVE_HEALTH, normalizedMaxReviveHealth);
+        float reviveHealth = normalizeToWholeHearts(clampedReviveHealth);
+        healthStats.setCurrentReviveHealth(reviveHealth);
+        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+        return reviveHealth;
+    }
+
+    public static void applyReviveDegradationAfterRevive(Player player) {
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        float maxReviveHealth = healthStats.getReviveItemMaxHealth();
+        float degradeStep = healthStats.getReviveHealthDegradeStep();
+
+        if (maxReviveHealth <= 0.0f || degradeStep <= 0.0f) {
+            return;
+        }
+
+        float currentReviveHealth = healthStats.getCurrentReviveHealth();
+        if (currentReviveHealth <= 0.0f) {
+            currentReviveHealth = maxReviveHealth;
+        }
+
+        float degradedHealth = Math.clamp(currentReviveHealth - degradeStep, MINIMUM_REVIVE_HEALTH, maxReviveHealth);
+        degradedHealth = normalizeToWholeHearts(degradedHealth);
+        healthStats.setCurrentReviveHealth(degradedHealth);
+        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+    }
+
+    public static void resetReviveDegradation(Player player) {
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        float maxReviveHealth = healthStats.getReviveItemMaxHealth();
+        if (maxReviveHealth <= 0.0f) {
+            return;
+        }
+
+        healthStats.setCurrentReviveHealth(normalizeToWholeHearts(maxReviveHealth));
+        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+    }
+
+    private static float normalizeToWholeHearts(float healthValue) {
+        float normalized = (float) (Math.floor(healthValue / 2.0f) * 2.0f);
+        return Math.max(MINIMUM_REVIVE_HEALTH, normalized);
+    }
+
+    private static float normalizeDegradeStep(float degradeStep) {
+        if (degradeStep <= 0.0f) {
+            return 0.0f;
+        }
+
+        float normalized = (float) (Math.floor(degradeStep / 2.0f) * 2.0f);
+        return Math.max(2.0f, normalized);
+    }
+
+    private static boolean nearlyEqual(float a, float b) {
+        return Math.abs(a - b) < 0.0001f;
+    }
+
     public static boolean tryUseHealthModifierItem(LivingEntityUseItemEvent.Finish event, Player player, ItemStack itemInHand) {
         // Check if the item is a health modifier item
         HealthModifierItem healthModifierItem = HealthModifierItem.fromItem(itemInHand);
@@ -85,9 +153,7 @@ public class HealthSystem {
             return false;
         }
 
-        ServerPlayer serverPlayer = (ServerPlayer) player;
-        if(serverPlayer == null) {
-            System.out.println("ServerPlayer is null");
+        if (!(player instanceof ServerPlayer serverPlayer)) {
             return false;
         }
 
@@ -150,9 +216,12 @@ public class HealthSystem {
             // Set the player's max health stats (only if possible to increase)
             boolean success = HealthSystem.setPlayerMaxHealthMoreIfPossible(player, healthValue);
 
-            if(success)
-            {
-                // Add confetti effect
+            // Reset degradation only when this food actually increases permanent max health.
+            if (success) {
+                HealthSystem.resetReviveDegradation(player);
+            }
+
+            if (success) {
                 player.level().addParticle(
                         ParticleTypes.HAPPY_VILLAGER,
                         player.getX(), player.getY() + 1, player.getZ(),
@@ -172,7 +241,7 @@ public class HealthSystem {
             if (itemStack.is(Items.ENCHANTED_GOLDEN_APPLE)) {
                 return ENCHANTED_GOLDEN_APPLE;
             }
-            return null;  // No revival item found
+            return null;
         }
     }
 }

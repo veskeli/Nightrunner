@@ -199,17 +199,20 @@ public class ModEvents {
         if (stack.getItem() == Items.GOLDEN_APPLE) {
             event.getToolTip().add(Component.literal("Sets max health to 10 hearts").withStyle(ChatFormatting.GREEN));
             event.getToolTip().add(Component.literal("Grants +5 temporary hearts").withStyle(ChatFormatting.GOLD));
+            event.getToolTip().add(Component.literal("Resets revive degradation to max").withStyle(ChatFormatting.AQUA));
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
         }
         // Check if the item is golden carrot
         else if (stack.getItem() == Items.GOLDEN_CARROT) {
             event.getToolTip().add(Component.literal("Sets max health to 8 hearts").withStyle(ChatFormatting.GREEN));
+            event.getToolTip().add(Component.literal("Resets revive degradation to max").withStyle(ChatFormatting.AQUA));
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
         }
         // Check if the item is enchanted golden apple
         else if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
             event.getToolTip().add(Component.literal("Sets max health to 11 hearts").withStyle(ChatFormatting.GREEN));
             event.getToolTip().add(Component.literal("Grants +8 temporary hearts").withStyle(ChatFormatting.GOLD));
+            event.getToolTip().add(Component.literal("Resets revive degradation to max").withStyle(ChatFormatting.AQUA));
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
         }
     }
