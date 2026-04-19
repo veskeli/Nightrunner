@@ -22,6 +22,8 @@ import net.veskeli.nightrunner.entity.client.GraveRenderer;
 import net.veskeli.nightrunner.entity.client.ManaOrbRenderer;
 import net.veskeli.nightrunner.item.ModCreativeModeTabs;
 import net.veskeli.nightrunner.item.ModItems;
+import net.veskeli.nightrunner.entity.modifiers.MobModifierRegistry;
+import net.veskeli.nightrunner.entity.modifiers.MobSpawnEvents;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
@@ -68,6 +70,7 @@ public class Nightrunner
         NeoForge.EVENT_BUS.register(new ManaEvents());
 
         NeoForge.EVENT_BUS.register(new ClientEvents());
+        NeoForge.EVENT_BUS.register(new MobSpawnEvents());
 
         //ClientEvents.register(modEventBus);
 
@@ -109,7 +112,7 @@ public class Nightrunner
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+        MobModifierRegistry.init();
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
