@@ -3,6 +3,8 @@ package net.veskeli.nightrunner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
@@ -11,10 +13,13 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
@@ -27,6 +32,7 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.GameType;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -43,6 +49,8 @@ import net.veskeli.nightrunner.item.ModItems;
 import java.util.*;
 
 public class ModEvents {
+
+    private static final float FALL_DAMAGE_SURVIVAL_HEALTH = 1.0f;
 
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
@@ -104,6 +112,80 @@ public class ModEvents {
 
         // Drop experience orbs (player's experience)
         //dropExperience(player);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPlayerFallDamage(LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+
+        if (!event.getSource().is(DamageTypes.FALL)) {
+            return;
+        }
+
+        float damage = event.getAmount();
+        if (damage <= 0.0f) {
+            return;
+        }
+
+        float health = player.getHealth();
+        float absorption = player.getAbsorptionAmount();
+        if (absorption <= 0.0f || health <= 0.0f) {
+            return;
+        }
+
+        // Prefer reducing normal health on fall damage while health can survive the hit.
+        if (damage < health) {
+            event.setCanceled(true);
+            player.setHealth(health - damage);
+            applyFallFeedback(player, damage, event.getSource());
+            return;
+        }
+
+        // If the combined pool cannot survive, let vanilla resolve the fatal hit.
+        float totalHealthPool = health + absorption;
+        if (damage >= totalHealthPool) {
+            return;
+        }
+
+        // Fall hit is survivable only with absorption: keep player barely alive and spend required temp health.
+        float maxHealthDamage = Math.max(0.0f, health - FALL_DAMAGE_SURVIVAL_HEALTH);
+        float healthDamage = Math.min(damage, maxHealthDamage);
+        float absorptionDamage = damage - healthDamage;
+
+        if (absorptionDamage > absorption) {
+            absorptionDamage = absorption;
+            healthDamage = damage - absorptionDamage;
+        }
+
+        float newHealth = Math.max(FALL_DAMAGE_SURVIVAL_HEALTH, health - healthDamage);
+        float newAbsorption = Math.max(0.0f, absorption - absorptionDamage);
+
+        event.setCanceled(true);
+        player.setHealth(newHealth);
+        player.setAbsorptionAmount(newAbsorption);
+        applyFallFeedback(player, damage, event.getSource());
+    }
+
+    private static void applyFallFeedback(ServerPlayer player, float damage, DamageSource source) {
+        ServerLevel level = player.serverLevel();
+        level.broadcastDamageEvent(player, source);
+        var fallSound = damage > 4.0f ? SoundEvents.PLAYER_BIG_FALL : SoundEvents.PLAYER_SMALL_FALL;
+        level.playSound(null, player.blockPosition(), fallSound, SoundSource.PLAYERS, 1.0f, 1.0f);
+
+        // Reproduce the hurt camera/animation feedback when we bypass vanilla damage application.
+        player.animateHurt(player.getYRot());
+        player.indicateDamage(0.0, 0.0);
+
+        BlockPos particlePos = player.blockPosition().below();
+        var state = level.getBlockState(particlePos);
+        if (!state.isAir()) {
+            int count = (int) Math.clamp(damage * 5.0f, 8.0f, 40.0f);
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
+                    player.getX(), player.getY(), player.getZ(),
+                    count, 0.3, 0.1, 0.3, 0.01);
+        }
     }
 
     private static boolean consumeTotemIfPresent(ServerPlayer player) {
