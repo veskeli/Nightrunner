@@ -39,6 +39,12 @@ public class ReviveSystem {
             return;
         }
 
+        UUID graveId = grave.getGraveId();
+        if (graveId == null) {
+            interactor.displayClientMessage(Component.literal("This grave is missing its soul binding."), true);
+            return;
+        }
+
         ServerLevel level = (ServerLevel) interactor.level();
         ServerPlayer ownerPlayer = level.getServer().getPlayerList().getPlayer(graveOwnerId);
         if (ownerPlayer == null) {
@@ -96,7 +102,13 @@ public class ReviveSystem {
         public abstract void revive(ServerPlayer ownerPlayer, GraveEntity grave, ServerPlayer interactor, ServerLevel level, ItemStack itemInHand);
 
         private static void restoreInventory(ServerPlayer ownerPlayer, GraveEntity grave) {
-            List<ItemStack> stored = GraveDataStore.retrieveInventory(grave.getOwner());
+            UUID ownerId = grave.getOwner();
+            UUID graveId = grave.getGraveId();
+            if (ownerId == null || graveId == null) {
+                return;
+            }
+
+            List<ItemStack> stored = GraveDataStore.consumeInventory(ownerPlayer.serverLevel(), ownerId, graveId);
             if (stored != null) {
                 ownerPlayer.getInventory().clearContent();
                 for (int i = 0; i < stored.size(); i++) {

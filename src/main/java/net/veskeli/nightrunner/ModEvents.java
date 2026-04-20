@@ -1,61 +1,45 @@
 package net.veskeli.nightrunner;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.healthsystem.GraveDataStore;
-import net.veskeli.nightrunner.healthsystem.HealthStats;
 import net.veskeli.nightrunner.healthsystem.HealthSystem;
 import net.veskeli.nightrunner.healthsystem.ReviveSystem;
 import net.veskeli.nightrunner.item.ModItems;
-import net.veskeli.nightrunner.networking.ClientPayloadHandler;
-import net.veskeli.nightrunner.networking.ManaSyncPacket;
-import net.veskeli.nightrunner.networking.ServerPayloadHandler;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ModEvents {
@@ -85,26 +69,115 @@ public class ModEvents {
     public void onPlayerDeath(LivingDeathEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
 
+        // Respect totems in either hand before applying custom death flow.
+        if (consumeTotemIfPresent(player)) {
+            event.setCanceled(true);
+            return;
+        }
+
         event.setCanceled(true); // Cancel actual death
         player.setGameMode(GameType.SPECTATOR); // Set to spectator
         player.setHealth(1.0f); // Set to 0.5 heart so they don't die after spectator switch
+
+        UUID graveId = UUID.randomUUID();
+
+        applyHalfXpPenalty(player);
+        storeInventoryWithoutVanishing(player, graveId);
+        broadcastDeathDetails(player);
 
         // Send title
         player.connection.send(new ClientboundSetTitleTextPacket(Component.literal("You died").withStyle(style -> style.withColor(ChatFormatting.RED))));
         player.connection.send(new ClientboundSetTitlesAnimationPacket(10, 40, 10));
 
         // Summon grave
-        SummonGraveForPlayer(player);
+        SummonGraveForPlayer(player, graveId);
 
         // Drop items to the floor (inventory)
         //dropItemsToFloor(player);
 
         // Drop experience orbs (player's experience)
         //dropExperience(player);
+    }
 
-        // Store inventory
-        //GraveDataStore.storeInventory(player.getUUID(), new ArrayList<>(player.getInventory().items));
-        //player.getInventory().clearContent();
+    private static boolean consumeTotemIfPresent(ServerPlayer player) {
+        if (consumeTotemFromHand(player, InteractionHand.MAIN_HAND) || consumeTotemFromHand(player, InteractionHand.OFF_HAND)) {
+            player.setHealth(1.0f);
+            player.removeAllEffects();
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1));
+            player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 0));
+            player.level().playSound(null, player.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean consumeTotemFromHand(ServerPlayer player, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+        if (!held.is(Items.TOTEM_OF_UNDYING)) {
+            return false;
+        }
+
+        held.shrink(1);
+        return true;
+    }
+
+    private static void applyHalfXpPenalty(ServerPlayer player) {
+        int keptXp = Math.max(0, player.totalExperience / 2);
+        player.setExperienceLevels(0);
+        player.setExperiencePoints(0);
+        player.totalExperience = 0;
+        player.experienceProgress = 0.0f;
+        player.giveExperiencePoints(keptXp);
+    }
+
+    private static void storeInventoryWithoutVanishing(ServerPlayer player, UUID graveId) {
+        int size = player.getInventory().getContainerSize();
+        List<ItemStack> stored = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            stored.add(ItemStack.EMPTY);
+        }
+
+        for (int i = 0; i < size; i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.isEmpty()) {
+                continue;
+            }
+
+            if (hasVanishingCurse(stack)) {
+                continue;
+            }
+
+            stored.set(i, stack.copy());
+        }
+
+        GraveDataStore.storeInventory(player.serverLevel(), player.getUUID(), graveId, stored);
+        player.getInventory().clearContent();
+    }
+
+    private static void broadcastDeathDetails(ServerPlayer player) {
+        BlockPos pos = player.blockPosition();
+        String dimensionId = player.level().dimension().location().toString();
+
+        Component details = Component.literal(String.format(" [Dim: %s | XYZ: %d %d %d]", dimensionId, pos.getX(), pos.getY(), pos.getZ()))
+                .withStyle(ChatFormatting.AQUA);
+
+        // Use vanilla death message so mob/type/cause details stay localized and consistent.
+        Component vanillaDeathMessage = player.getCombatTracker().getDeathMessage().copy();
+        MutableComponent fullMessage = Component.empty().append(vanillaDeathMessage).append(details);
+        player.server.getPlayerList().broadcastSystemMessage(fullMessage, false);
+    }
+
+    private static boolean hasVanishingCurse(ItemStack stack) {
+        ItemEnchantments enchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        for (Holder<Enchantment> enchantment : enchantments.keySet()) {
+            if (enchantment.unwrapKey().isPresent()
+                    && "minecraft:vanishing_curse".equals(enchantment.unwrapKey().get().location().toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SubscribeEvent(priority = EventPriority.NORMAL)
@@ -161,7 +234,7 @@ public class ModEvents {
         }
     }
 
-    private static void SummonGraveForPlayer(ServerPlayer player) {
+    private static void SummonGraveForPlayer(ServerPlayer player, UUID graveId) {
         if (player.level().isClientSide()) return;
 
         GraveEntity grave = new GraveEntity(ModEntities.GRAVE.get(), player.level());
@@ -169,6 +242,7 @@ public class ModEvents {
 
         grave.setCustomName(Component.literal(player.getName().getString() + "'s Grave"));
         grave.setOwner(player.getUUID());
+        grave.setGraveId(graveId);
 
         player.level().addFreshEntity(grave);
     }
@@ -188,7 +262,41 @@ public class ModEvents {
 
         ItemStack itemInHand = event.getItemStack();
 
+        UUID ownerId = grave.getOwner();
+        if (ownerId != null && ownerId.equals(interactor.getUUID()) && itemInHand.isEmpty()) {
+            claimGraveItemsAsDrops(event, grave, interactor);
+            return;
+        }
+
         ReviveSystem.TryRevive(event, grave, interactor, itemInHand);
+    }
+
+    private static void claimGraveItemsAsDrops(PlayerInteractEvent.EntityInteractSpecific event, GraveEntity grave, ServerPlayer owner) {
+        UUID ownerId = grave.getOwner();
+        UUID graveId = grave.getGraveId();
+        if (ownerId == null || graveId == null) {
+            owner.displayClientMessage(Component.literal("This grave has no recoverable inventory."), true);
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+            return;
+        }
+
+        List<ItemStack> stored = GraveDataStore.consumeInventory(owner.serverLevel(), ownerId, graveId);
+        if (stored != null) {
+            for (ItemStack stack : stored) {
+                if (stack.isEmpty()) {
+                    continue;
+                }
+
+                ItemEntity drop = new ItemEntity(owner.level(), grave.getX(), grave.getY() + 0.5, grave.getZ(), stack.copy());
+                owner.level().addFreshEntity(drop);
+            }
+        }
+
+        grave.discard();
+        owner.displayClientMessage(Component.literal("You claimed your grave. Items dropped on the ground."), true);
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.SUCCESS);
     }
 
     @SubscribeEvent

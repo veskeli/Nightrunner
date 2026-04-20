@@ -17,6 +17,10 @@ public class GraveEntity extends ArmorStand {
             GraveEntity.class,
             EntityDataSerializers.OPTIONAL_UUID
     );
+    private static final EntityDataAccessor<java.util.Optional<UUID>> GRAVE_UUID = SynchedEntityData.defineId(
+            GraveEntity.class,
+            EntityDataSerializers.OPTIONAL_UUID
+    );
 
     public GraveEntity(EntityType<? extends ArmorStand> entityType, Level level) {
         super(entityType, level);
@@ -28,6 +32,7 @@ public class GraveEntity extends ArmorStand {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(OWNER_UUID, java.util.Optional.empty());
+        builder.define(GRAVE_UUID, java.util.Optional.empty());
     }
 
     // Prevent damage from all sources
@@ -64,12 +69,25 @@ public class GraveEntity extends ArmorStand {
         return this.entityData.get(OWNER_UUID).orElse(null);
     }
 
+    public void setGraveId(UUID uuid) {
+        this.entityData.set(GRAVE_UUID, java.util.Optional.ofNullable(uuid));
+    }
+
+    public UUID getGraveId() {
+        return this.entityData.get(GRAVE_UUID).orElse(null);
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         UUID owner = getOwner();
         if (owner != null) {
             tag.putUUID("Owner", owner);
+        }
+
+        UUID graveId = getGraveId();
+        if (graveId != null) {
+            tag.putUUID("GraveId", graveId);
         }
     }
 
@@ -78,6 +96,9 @@ public class GraveEntity extends ArmorStand {
         super.readAdditionalSaveData(tag);
         if (tag.hasUUID("Owner")) {
             setOwner(tag.getUUID("Owner"));
+        }
+        if (tag.hasUUID("GraveId")) {
+            setGraveId(tag.getUUID("GraveId"));
         }
 
         // Keep the grave interactable and stationary after reload.
