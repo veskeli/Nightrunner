@@ -1,18 +1,21 @@
-{
+﻿{
   "type": "minecraft:crafting_shaped",
   "category": "tools",
   "key": {
-    "i": {
-      "item": "minecraft:cobblestone"
+    "s": {
+      "tag": "nightrunner_difficulty:soulstone_stones"
     },
     "y": {
       "item": "minecraft:rotten_flesh"
+    },
+    "c": {
+      "tag": "nightrunner_difficulty:soulstone_core_materials"
     }
   },
   "pattern": [
     " y ",
-    "yyy",
-    "iii"
+    "ycy",
+    "sss"
   ],
   "result": {
     "count": 1,

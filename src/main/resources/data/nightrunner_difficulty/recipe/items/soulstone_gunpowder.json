@@ -1,0 +1,25 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "key": {
+    "s": {
+      "tag": "nightrunner_difficulty:soulstone_stones"
+    },
+    "y": {
+      "item": "minecraft:gunpowder"
+    },
+    "c": {
+      "tag": "nightrunner_difficulty:soulstone_core_materials"
+    }
+  },
+  "pattern": [
+    " y ",
+    "ycy",
+    "sss"
+  ],
+  "result": {
+    "count": 1,
+    "id": "nightrunner_difficulty:soulstone"
+  }
+}
+
