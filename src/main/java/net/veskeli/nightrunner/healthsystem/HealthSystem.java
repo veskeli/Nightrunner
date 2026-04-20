@@ -147,6 +147,7 @@ public class HealthSystem {
     public static boolean tryUseHealthModifierItem(LivingEntityUseItemEvent.Finish event, Player player, ItemStack itemInHand) {
         // Check if the item is a health modifier item
         HealthModifierItem healthModifierItem = HealthModifierItem.fromItem(itemInHand);
+        ReviveSystem.SelfReviveSource selfReviveSource = ReviveSystem.SelfReviveSource.fromItem(itemInHand);
         // If the item is not a health modifier item, return
         if (healthModifierItem == null) {
             System.out.println("Item is not a health modifier item");
@@ -159,6 +160,11 @@ public class HealthSystem {
 
         // Use the item
         healthModifierItem.useHealthModifier(serverPlayer, itemInHand);
+
+        if (selfReviveSource != null) {
+            ReviveSystem.grantSelfRevive(serverPlayer, selfReviveSource);
+        }
+
         return true;
     }
 

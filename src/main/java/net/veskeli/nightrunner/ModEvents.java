@@ -63,6 +63,10 @@ public class ModEvents {
 
         // Send the mana data to the client
         Mana.replicateData(mana, (ServerPlayer) player);
+
+        if (player instanceof ServerPlayer serverPlayer && serverPlayer.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
+            ReviveSystem.sendSelfReviveOffer(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -91,6 +95,9 @@ public class ModEvents {
 
         // Summon grave
         SummonGraveForPlayer(player, graveId);
+
+        // Offer manual self-revive when a pending charge exists.
+        ReviveSystem.sendSelfReviveOffer(player);
 
         // Drop items to the floor (inventory)
         //dropItemsToFloor(player);
@@ -320,6 +327,7 @@ public class ModEvents {
         else if (stack.getItem() == Items.ENCHANTED_GOLDEN_APPLE) {
             event.getToolTip().add(Component.literal("Sets max health to 11 hearts").withStyle(ChatFormatting.GREEN));
             event.getToolTip().add(Component.literal("Grants +8 temporary hearts").withStyle(ChatFormatting.GOLD));
+            event.getToolTip().add(Component.literal("Grants 1 manual self revive for next death").withStyle(ChatFormatting.LIGHT_PURPLE));
             event.getToolTip().add(Component.literal("Resets revive degradation to max").withStyle(ChatFormatting.AQUA));
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
         }

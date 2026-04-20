@@ -20,4 +20,12 @@ public interface IHealthStats {
     float getReviveHealthDegradeStep();
 
     void setReviveHealthDegradeStep(float step);
+
+    boolean hasPendingSelfRevive();
+
+    void setPendingSelfRevive(boolean pending);
+
+    String getPendingSelfReviveSourceId();
+
+    void setPendingSelfReviveSourceId(String sourceId);
 }

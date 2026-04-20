@@ -20,6 +20,10 @@ public class NightrunnerCommands {
                             .executes(context -> ReviveCommand.execute(context, EntityArgument.getPlayer(context, "player"))))
                 )
                 .then(
+                    Commands.literal("selfrevive")
+                        .executes(SelfReviveCommand::execute)
+                )
+                .then(
                     Commands.literal("cleargraves")
                         .requires(source -> source.hasPermission(2))
                         .executes(context -> ClearGravesCommand.executeAll(context))

@@ -1,7 +1,11 @@
 package net.veskeli.nightrunner.healthsystem;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -11,7 +15,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.item.ModItems;
 
@@ -19,6 +25,127 @@ import java.util.List;
 import java.util.UUID;
 
 public class ReviveSystem {
+
+    private static final float SELF_REVIVE_HEALTH = 2.0f;
+
+    public enum SelfReviveSource {
+        ENCHANTED_GOLDEN_APPLE("enchanted_golden_apple") {
+            @Override
+            public boolean matches(ItemStack stack) {
+                return stack.is(Items.ENCHANTED_GOLDEN_APPLE);
+            }
+        };
+
+        private final String id;
+
+        SelfReviveSource(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public abstract boolean matches(ItemStack stack);
+
+        public static SelfReviveSource fromItem(ItemStack stack) {
+            for (SelfReviveSource source : values()) {
+                if (source.matches(stack)) {
+                    return source;
+                }
+            }
+            return null;
+        }
+
+        public static SelfReviveSource fromId(String id) {
+            if (id == null || id.isEmpty()) {
+                return null;
+            }
+
+            for (SelfReviveSource source : values()) {
+                if (source.id.equals(id)) {
+                    return source;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static void grantSelfRevive(ServerPlayer player, SelfReviveSource source) {
+        if (source == null) {
+            return;
+        }
+
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        healthStats.setPendingSelfRevive(true);
+        healthStats.setPendingSelfReviveSourceId(source.getId());
+        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+
+        player.displayClientMessage(Component.literal("Your next death can be self-revived.").withStyle(ChatFormatting.AQUA), false);
+    }
+
+    public static boolean hasPendingSelfRevive(ServerPlayer player) {
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        return healthStats.hasPendingSelfRevive();
+    }
+
+    public static void sendSelfReviveOffer(ServerPlayer player) {
+        if (!hasPendingSelfRevive(player)) {
+            return;
+        }
+
+        Component clickable = Component.literal("[Click here]")
+                .withStyle(style -> style
+                        .withColor(ChatFormatting.GOLD)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nr selfrevive"))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Revive to respawn point with 1 heart")))
+                        .withUnderlined(true));
+
+        player.displayClientMessage(
+                Component.literal("You can self revive to your last respawn point with one heart. ")
+                        .withStyle(ChatFormatting.AQUA)
+                        .append(clickable),
+                false
+        );
+    }
+
+    public static boolean tryUsePendingSelfRevive(ServerPlayer player) {
+        HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
+        if (!healthStats.hasPendingSelfRevive()) {
+            return false;
+        }
+
+        if (player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
+            return false;
+        }
+
+        reviveToRespawnPoint(player);
+        healthStats.setPendingSelfRevive(false);
+        healthStats.setPendingSelfReviveSourceId("");
+        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+        player.displayClientMessage(Component.literal("Self revive used."), false);
+        return true;
+    }
+
+    private static void reviveToRespawnPoint(ServerPlayer player) {
+        MinecraftServer server = player.server;
+        ServerLevel targetLevel = server.getLevel(player.getRespawnDimension());
+
+        if (targetLevel == null) {
+            targetLevel = server.getLevel(Level.OVERWORLD);
+        }
+
+        if (targetLevel == null) {
+            targetLevel = player.serverLevel();
+        }
+
+        var respawnPos = player.getRespawnPosition();
+        var targetPos = respawnPos != null ? respawnPos : targetLevel.getSharedSpawnPos();
+
+        player.setGameMode(GameType.SURVIVAL);
+        player.teleportTo(targetLevel, targetPos.getX() + 0.5, targetPos.getY() + 1, targetPos.getZ() + 0.5, player.getYRot(), player.getXRot());
+        HealthSystem.setPlayerMaxHealth(player, SELF_REVIVE_HEALTH);
+    }
 
     public static void TryRevive(PlayerInteractEvent.EntityInteractSpecific event, GraveEntity grave, ServerPlayer interactor, ItemStack itemInHand) {
         // Check if the item is supported for revival
