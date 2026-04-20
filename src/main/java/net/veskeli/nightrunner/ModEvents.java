@@ -207,7 +207,7 @@ public class ModEvents {
             return; // Exit if health modifier item was used successfully
         }
 
-        // Check if the item is heart fruit or heart fruit plus
+        // Check if the item is a temporary health food
         if(itemInHand.is(ModItems.HeartFruit))
         {
             HealthSystem.addTemporaryHealth(player, 1.0f, 2.0f);
@@ -215,6 +215,11 @@ public class ModEvents {
         else if(itemInHand.is(ModItems.HeartFruitPlus))
         {
             HealthSystem.addTemporaryHealth(player, 3.0f, 6.0f);
+        }
+        else if(itemInHand.is(Items.HONEY_BOTTLE))
+        {
+            // +1 heart per use, capped at +2 hearts total.
+            HealthSystem.addTemporaryHealth(player, 2.0f, 4.0f);
         }
     }
 
@@ -330,6 +335,10 @@ public class ModEvents {
             event.getToolTip().add(Component.literal("Grants 1 manual self revive for next death").withStyle(ChatFormatting.LIGHT_PURPLE));
             event.getToolTip().add(Component.literal("Resets revive degradation to max").withStyle(ChatFormatting.AQUA));
             event.getToolTip().add(Component.literal("Does not reduce max health").withStyle(ChatFormatting.GRAY));
+        }
+        else if (stack.getItem() == Items.HONEY_BOTTLE) {
+            event.getToolTip().add(Component.literal("On consumption, gives one heart of temporary health.").withStyle(ChatFormatting.GRAY));
+            event.getToolTip().add(Component.literal("Maximum 2 extra hearts").withStyle(ChatFormatting.GRAY));
         }
     }
 
