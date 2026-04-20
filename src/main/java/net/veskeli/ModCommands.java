@@ -11,9 +11,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.veskeli.nightrunner.ManaSystem.Mana;
 import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.networking.ManaSyncPacket;
+import net.veskeli.nightrunner.commands.NightrunnerCommands;
 
 public class ModCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        // Register Nightrunner commands (/nr)
+        NightrunnerCommands.register(dispatcher);
         // Set spell level
         dispatcher.register(net.minecraft.commands.Commands.literal("SetSpellLevel")
                 .then(Commands.argument("Player", EntityArgument.player())
