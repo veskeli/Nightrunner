@@ -119,9 +119,14 @@ public class MobModifierRegistry {
                 )
                 .build());
 
-        // Spiders are a bit faster than other mobs, so we give them a permanent speed boost but no presets for now.
+        // Spiders keep their stronger baseline stats, with a rare brood preset that splits on death.
         register(EntityType.SPIDER, MobPresetTable.builder()
                 .always(setSpeed(0.35), setDamage(6))
+                .preset("default", 85)
+                .preset("broodmother", 15,
+                        setScale(1.7),
+                        setDamage(8)
+                )
                 .build());
     }
 
