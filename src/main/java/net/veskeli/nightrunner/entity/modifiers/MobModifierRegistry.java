@@ -103,6 +103,11 @@ public class MobModifierRegistry {
                         setMaxHealth(30),
                         setScale(1.25)
                 )
+                .preset("splitter", 5,
+                        setExplosionRadius(5),
+                        setFuse(35),
+                        setScale(1.5)
+                )
                 .preset("Lite", 10,
                         setExplosionRadius(2),
                         setFuse(15),
@@ -110,7 +115,7 @@ public class MobModifierRegistry {
                         setMaxHealth(10),
                         setScale(0.75)
                 )
-                .preset("Default", 85,
+                .preset("Default", 80,
                         setExplosionRadius(5),
                         setFuse(30),
                         setSpeed(0.25),

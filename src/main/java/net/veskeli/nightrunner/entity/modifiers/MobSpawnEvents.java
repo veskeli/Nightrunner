@@ -1,16 +1,22 @@
 package net.veskeli.nightrunner.entity.modifiers;
 
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.variants.ghast.MultiShotGhast;
+import org.joml.Vector3f;
 
 public class MobSpawnEvents {
 
@@ -19,10 +25,24 @@ public class MobSpawnEvents {
     public static final String NIGHTRUNNER_PRESET_PREFIX = "nightrunner_preset:";
     public static final String NIGHTRUNNER_SKIP_MODIFIERS_TAG = "nightrunner_skip_modifiers";
     private static final String BROODMOTHER_PRESET_ID = "broodmother";
+    private static final String SPLITTER_PRESET_ID = "splitter";
+    private static final String SPLITTER_ARMED_DATA_KEY = "nightrunner_splitter_armed";
+    private static final String SPLITTER_SPLIT_AT_DATA_KEY = "nightrunner_splitter_split_at";
     private static final float GHAST_VARIANT_CHANCE = 0.30F;
     private static final int BROODMOTHER_CHILD_COUNT = 2;
     private static final double BROODMOTHER_CHILD_SCALE = 0.7D;
     private static final double BROODMOTHER_CHILD_SPAWN_RADIUS = 0.7D;
+    private static final double SPLITTER_TRIGGER_DISTANCE = 4.0D;
+    private static final double SPLITTER_TRIGGER_DISTANCE_SQUARED = SPLITTER_TRIGGER_DISTANCE * SPLITTER_TRIGGER_DISTANCE;
+    private static final int SPLITTER_MIN_DELAY_TICKS = 20;
+    private static final int SPLITTER_MAX_DELAY_TICKS = 34;
+    private static final int SPLITTER_CHILD_COUNT = 2;
+    private static final int SPLITTER_CHILD_FUSE = 30;
+    private static final int SPLITTER_CHILD_EXPLOSION_RADIUS = 3;
+    private static final double SPLITTER_CHILD_SCALE = 0.5D;
+    private static final double SPLITTER_CHILD_SPEED = 0.3D;
+    private static final double SPLITTER_CHILD_SPAWN_RADIUS = 0.9D;
+    private static final DustParticleOptions SPLITTER_WARNING_PARTICLE = new DustParticleOptions(new Vector3f(0.2F, 0.95F, 0.2F), 1.0F);
 
     @SubscribeEvent
     public void onGhastFinalizeSpawn(FinalizeSpawnEvent event) {
@@ -78,8 +98,63 @@ public class MobSpawnEvents {
         spawnBroodmotherChildren(serverLevel, spider);
     }
 
+    @SubscribeEvent
+    public void onEntityTick(EntityTickEvent.Post event) {
+        if (!(event.getEntity() instanceof Creeper creeper)) return;
+        if (creeper.getType() != EntityType.CREEPER) return;
+        if (!(creeper.level() instanceof ServerLevel serverLevel)) return;
+        if (!hasPreset(creeper, SPLITTER_PRESET_ID)) return;
+        if (!creeper.isAlive() || creeper.isRemoved()) return;
+
+        handleSplitterCreeperTick(serverLevel, creeper);
+    }
+
     private static boolean hasPreset(Monster mob, String presetId) {
         return mob.getTags().contains(NIGHTRUNNER_PRESET_PREFIX + presetId);
+    }
+
+    private static void handleSplitterCreeperTick(ServerLevel serverLevel, Creeper creeper) {
+        CompoundTag persistentData = creeper.getPersistentData();
+
+        if (!persistentData.getBoolean(SPLITTER_ARMED_DATA_KEY)) {
+            if (!(creeper.getTarget() instanceof Player targetPlayer)) {
+                return;
+            }
+
+            if (creeper.distanceToSqr(targetPlayer) >= SPLITTER_TRIGGER_DISTANCE_SQUARED) {
+                return;
+            }
+
+            persistentData.putBoolean(SPLITTER_ARMED_DATA_KEY, true);
+            persistentData.putLong(
+                    SPLITTER_SPLIT_AT_DATA_KEY,
+                    serverLevel.getGameTime() + creeper.getRandom().nextInt(SPLITTER_MIN_DELAY_TICKS, SPLITTER_MAX_DELAY_TICKS + 1)
+            );
+        }
+
+        emitSplitterParticles(serverLevel, creeper);
+
+        if (serverLevel.getGameTime() < persistentData.getLong(SPLITTER_SPLIT_AT_DATA_KEY)) {
+            return;
+        }
+
+        spawnSplitterChildren(serverLevel, creeper);
+        creeper.discard();
+    }
+
+    private static void emitSplitterParticles(ServerLevel serverLevel, Creeper creeper) {
+        double particleSpread = creeper.getBbWidth() * 0.4D;
+        serverLevel.sendParticles(
+                SPLITTER_WARNING_PARTICLE,
+                creeper.getX(),
+                creeper.getY() + (creeper.getBbHeight() * 0.5D),
+                creeper.getZ(),
+                10,
+                particleSpread,
+                creeper.getBbHeight() * 0.3D,
+                particleSpread,
+                0.01D
+        );
     }
 
     private static void spawnBroodmotherChildren(ServerLevel serverLevel, Spider parent) {
@@ -97,6 +172,34 @@ public class MobSpawnEvents {
             child.setDeltaMovement(parent.getDeltaMovement().scale(0.25D));
             child.addTag(NIGHTRUNNER_SKIP_MODIFIERS_TAG);
             MobModifierRegistry.setScale(BROODMOTHER_CHILD_SCALE).apply(child);
+
+            if (parent.getTarget() != null) {
+                child.setTarget(parent.getTarget());
+            }
+
+            serverLevel.addFreshEntity(child);
+        }
+    }
+
+    private static void spawnSplitterChildren(ServerLevel serverLevel, Creeper parent) {
+        for (int index = 0; index < SPLITTER_CHILD_COUNT; index++) {
+            Creeper child = EntityType.CREEPER.create(serverLevel);
+            if (child == null) {
+                continue;
+            }
+
+            double angle = ((Math.PI * 2D) / SPLITTER_CHILD_COUNT) * index;
+            double x = parent.getX() + Math.cos(angle) * SPLITTER_CHILD_SPAWN_RADIUS;
+            double z = parent.getZ() + Math.sin(angle) * SPLITTER_CHILD_SPAWN_RADIUS;
+
+            child.moveTo(x, parent.getY(), z, parent.getYRot(), parent.getXRot());
+            child.setDeltaMovement(parent.getDeltaMovement().scale(0.25D));
+            child.addTag(NIGHTRUNNER_SKIP_MODIFIERS_TAG);
+
+            MobModifierRegistry.setScale(SPLITTER_CHILD_SCALE).apply(child);
+            MobModifierRegistry.setSpeed(SPLITTER_CHILD_SPEED).apply(child);
+            MobModifierRegistry.setFuse(SPLITTER_CHILD_FUSE).apply(child);
+            MobModifierRegistry.setExplosionRadius(SPLITTER_CHILD_EXPLOSION_RADIUS).apply(child);
 
             if (parent.getTarget() != null) {
                 child.setTarget(parent.getTarget());
