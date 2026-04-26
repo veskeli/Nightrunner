@@ -67,6 +67,11 @@ public class ManaOrbEntity extends Entity {
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public boolean hurt(DamageSource source, float amount) {
         return false;
     }
