@@ -4,6 +4,9 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Ghast;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.veskeli.nightrunner.entity.ModEntities;
 import net.veskeli.nightrunner.entity.variants.ghast.MultiShotGhast;
@@ -26,6 +30,7 @@ public class MobSpawnEvents {
     public static final String NIGHTRUNNER_SKIP_MODIFIERS_TAG = "nightrunner_skip_modifiers";
     private static final String BROODMOTHER_PRESET_ID = "broodmother";
     private static final String SPLITTER_PRESET_ID = "splitter";
+    private static final String TOXIC_PRESET_ID = "toxic";
     private static final String SPLITTER_ARMED_DATA_KEY = "nightrunner_splitter_armed";
     private static final String SPLITTER_SPLIT_AT_DATA_KEY = "nightrunner_splitter_split_at";
     private static final float GHAST_VARIANT_CHANCE = 0.30F;
@@ -43,6 +48,11 @@ public class MobSpawnEvents {
     private static final double SPLITTER_CHILD_SPEED = 0.3D;
     private static final double SPLITTER_CHILD_SPAWN_RADIUS = 0.9D;
     private static final DustParticleOptions SPLITTER_WARNING_PARTICLE = new DustParticleOptions(new Vector3f(0.2F, 0.95F, 0.2F), 1.0F);
+    private static final DustParticleOptions TOXIC_AURA_PARTICLE = new DustParticleOptions(new Vector3f(0.15F, 0.85F, 0.15F), 0.9F);
+    private static final float TOXIC_CLOUD_RADIUS = 5.0F;
+    private static final int TOXIC_CLOUD_DURATION_TICKS = 180;
+    private static final int TOXIC_CLOUD_WAIT_TICKS = 10;
+    private static final int TOXIC_POISON_DURATION_TICKS = 220;
 
     @SubscribeEvent
     public void onGhastFinalizeSpawn(FinalizeSpawnEvent event) {
@@ -99,12 +109,27 @@ public class MobSpawnEvents {
     }
 
     @SubscribeEvent
+    public void onExplosionDetonate(ExplosionEvent.Detonate event) {
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
+        if (!(event.getExplosion().getDirectSourceEntity() instanceof Creeper creeper)) return;
+        if (creeper.getType() != EntityType.CREEPER) return;
+        if (!hasPreset(creeper, TOXIC_PRESET_ID)) return;
+
+        spawnToxicLingeringCloud(serverLevel, creeper);
+    }
+
+    @SubscribeEvent
     public void onEntityTick(EntityTickEvent.Post event) {
         if (!(event.getEntity() instanceof Creeper creeper)) return;
         if (creeper.getType() != EntityType.CREEPER) return;
         if (!(creeper.level() instanceof ServerLevel serverLevel)) return;
-        if (!hasPreset(creeper, SPLITTER_PRESET_ID)) return;
         if (!creeper.isAlive() || creeper.isRemoved()) return;
+
+        if (hasPreset(creeper, TOXIC_PRESET_ID)) {
+            emitToxicAuraParticles(serverLevel, creeper);
+        }
+
+        if (!hasPreset(creeper, SPLITTER_PRESET_ID)) return;
 
         handleSplitterCreeperTick(serverLevel, creeper);
     }
@@ -155,6 +180,32 @@ public class MobSpawnEvents {
                 particleSpread,
                 0.01D
         );
+    }
+
+    private static void emitToxicAuraParticles(ServerLevel serverLevel, Creeper creeper) {
+        double spread = creeper.getBbWidth() * 0.45D;
+        serverLevel.sendParticles(
+                TOXIC_AURA_PARTICLE,
+                creeper.getX(),
+                creeper.getY() + (creeper.getBbHeight() * 0.55D),
+                creeper.getZ(),
+                4,
+                spread,
+                creeper.getBbHeight() * 0.35D,
+                spread,
+                0.002D
+        );
+    }
+
+    private static void spawnToxicLingeringCloud(ServerLevel serverLevel, Creeper creeper) {
+        AreaEffectCloud cloud = new AreaEffectCloud(serverLevel, creeper.getX(), creeper.getY(), creeper.getZ());
+        cloud.setRadius(TOXIC_CLOUD_RADIUS);
+        cloud.setDuration(TOXIC_CLOUD_DURATION_TICKS);
+        cloud.setWaitTime(TOXIC_CLOUD_WAIT_TICKS);
+        cloud.setRadiusPerTick(-TOXIC_CLOUD_RADIUS / TOXIC_CLOUD_DURATION_TICKS);
+        cloud.setParticle(TOXIC_AURA_PARTICLE);
+        cloud.addEffect(new MobEffectInstance(MobEffects.POISON, TOXIC_POISON_DURATION_TICKS, 0));
+        serverLevel.addFreshEntity(cloud);
     }
 
     private static void spawnBroodmotherChildren(ServerLevel serverLevel, Spider parent) {

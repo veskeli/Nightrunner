@@ -109,6 +109,11 @@ public class MobModifierRegistry {
                         setFuse(35),
                         setScale(1.5)
                 )
+                .preset("toxic", 8,
+                        setExplosionRadius(0),
+                        setFuse(28),
+                        setSpeed(0.26)
+                )
                 .preset("Lite", 10,
                         setExplosionRadius(2),
                         setFuse(15),
