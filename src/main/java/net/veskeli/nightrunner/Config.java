@@ -36,12 +36,17 @@ public class Config
             .comment("A list of items to log on common setup.")
             .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
 
+    private static final ModConfigSpec.BooleanValue SELF_REVIVE_SOLO_ONLY = BUILDER
+            .comment("If true, /nr selfrevive can only be used when you are the only player online")
+            .define("selfReviveSoloOnly", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     public static boolean logDirtBlock;
     public static int magicNumber;
     public static String magicNumberIntroduction;
     public static Set<Item> items;
+    public static boolean selfReviveSoloOnly;
 
     private static boolean validateItemName(final Object obj)
     {
@@ -54,6 +59,7 @@ public class Config
         logDirtBlock = LOG_DIRT_BLOCK.get();
         magicNumber = MAGIC_NUMBER.get();
         magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
+        selfReviveSoloOnly = SELF_REVIVE_SOLO_ONLY.get();
 
         // convert the list of strings into a set of items
         items = ITEM_STRINGS.get().stream()

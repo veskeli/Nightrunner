@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.veskeli.nightrunner.Config;
 import net.veskeli.nightrunner.ModAttachments;
 import net.veskeli.nightrunner.entity.custom.GraveEntity;
 import net.veskeli.nightrunner.item.ModItems;
@@ -90,7 +91,14 @@ public class ReviveSystem {
     }
 
     public static void sendSelfReviveOffer(ServerPlayer player) {
-        if (!hasPendingSelfRevive(player)) {
+        boolean hasPending = hasPendingSelfRevive(player);
+        boolean solo = isSoloOnServer(player);
+
+        if (!hasPending && !solo) {
+            return;
+        }
+
+        if (Config.selfReviveSoloOnly && !solo) {
             return;
         }
 
@@ -101,17 +109,33 @@ public class ReviveSystem {
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Revive to respawn point with 1 heart")))
                         .withUnderlined(true));
 
-        player.displayClientMessage(
-                Component.literal("You can self revive to your last respawn point with one heart. ")
-                        .withStyle(ChatFormatting.AQUA)
-                        .append(clickable),
-                false
-        );
+        var message = hasPending
+                ? Component.literal("You can self revive to your last respawn point with one heart. ").withStyle(ChatFormatting.AQUA)
+                : Component.literal("You can self revive because you are playing solo, to your last respawn point with one heart. ").withStyle(ChatFormatting.AQUA);
+
+        player.displayClientMessage(message.append(clickable), false);
+    }
+
+    public static boolean isSoloOnServer(ServerPlayer player) {
+        MinecraftServer server = player.getServer();
+        if (server == null) {
+            return true;
+        }
+
+        return server.getPlayerCount() <= 1;
     }
 
     public static boolean tryUsePendingSelfRevive(ServerPlayer player) {
+        return tryUseSelfRevive(player);
+    }
+
+    public static boolean tryUseSelfRevive(ServerPlayer player) {
         HealthStats healthStats = player.getData(ModAttachments.PLAYER_HEALTH_STATS);
-        if (!healthStats.hasPendingSelfRevive()) {
+
+        boolean hasPending = healthStats.hasPendingSelfRevive();
+        boolean solo = isSoloOnServer(player);
+
+        if (!hasPending && !solo) {
             return false;
         }
 
@@ -120,10 +144,17 @@ public class ReviveSystem {
         }
 
         reviveToRespawnPoint(player);
-        healthStats.setPendingSelfRevive(false);
-        healthStats.setPendingSelfReviveSourceId("");
-        player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
-        player.displayClientMessage(Component.literal("Self revive used."), false);
+
+        if (hasPending) {
+            healthStats.setPendingSelfRevive(false);
+            healthStats.setPendingSelfReviveSourceId("");
+            player.setData(ModAttachments.PLAYER_HEALTH_STATS, healthStats);
+            player.displayClientMessage(Component.literal("Self revive used."), false);
+        } else {
+            player.displayClientMessage(Component.literal("Solo self revive used."), false);
+        }
+
+        player.displayClientMessage(Component.literal("You can retrieve your items from your grave."), false);
         return true;
     }
 
