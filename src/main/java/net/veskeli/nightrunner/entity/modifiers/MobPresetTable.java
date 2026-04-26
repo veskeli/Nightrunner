@@ -47,6 +47,16 @@ public final class MobPresetTable {
         return Optional.empty();
     }
 
+    public Optional<MobPreset> findPreset(String presetId) {
+        return weightedPresets.stream()
+                .filter(preset -> preset.id().equals(presetId))
+                .findFirst();
+    }
+
+    public List<String> presetIds() {
+        return weightedPresets.stream().map(MobPreset::id).toList();
+    }
+
     public static Builder builder() {
         return new Builder();
     }

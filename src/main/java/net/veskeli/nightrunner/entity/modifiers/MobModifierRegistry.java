@@ -58,6 +58,7 @@ public class MobModifierRegistry {
         // Skeleton
         MobPresetTable skeletonPresets = MobPresetTable.builder()
                 .always(setSpeed(0.30))
+                .preset("default", 100)
                 .build();
         register(EntityType.SKELETON, skeletonPresets);
         registerFamily(AbstractSkeleton.class, skeletonPresets);

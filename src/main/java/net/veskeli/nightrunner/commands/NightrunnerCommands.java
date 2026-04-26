@@ -5,7 +5,8 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.veskeli.nightrunner.commands.subcommands.*;
 
 public class NightrunnerCommands {
@@ -62,7 +63,37 @@ public class NightrunnerCommands {
                         .requires(source -> source.hasPermission(2))
                         .executes(context -> ClearBuggedGravesCommand.execute(context))
                 )
+                .then(
+                    Commands.literal("summon")
+                        .requires(source -> source.hasPermission(2))
+                        .then(Commands.argument("mob_id", ResourceLocationArgument.id())
+                            .suggests(SummonCommand.MOB_ID_SUGGESTIONS)
+                            .then(Commands.argument("pos", Vec3Argument.vec3())
+                                .then(Commands.argument("preset_id", StringArgumentType.word())
+                                    .suggests((context, builder) -> {
+                                        try {
+                                            var mobId = ResourceLocationArgument.getId(context, "mob_id");
+                                            String remaining = builder.getRemaining().toLowerCase();
+                                            for (String preset : SummonCommand.getPresetsForMob(context.getSource(), mobId)) {
+                                                if (preset.toLowerCase().startsWith(remaining)) {
+                                                    builder.suggest(preset);
+                                                }
+                                            }
+                                        } catch (Exception ignored) {
+                                        }
+                                        return builder.buildFuture();
+                                    })
+                                    .executes(context -> SummonCommand.execute(context,
+                                        ResourceLocationArgument.getId(context, "mob_id"),
+                                        Vec3Argument.getVec3(context, "pos"),
+                                        StringArgumentType.getString(context, "preset_id")))
+                                )
+                            )
+                        )
+                )
         );
     }
 }
+
+
 
